@@ -10,7 +10,8 @@ clc
 % correlation
 p = randperm(length(final_inputs_svm));
 random_final_inputs = final_inputs_svm(p, :);
-random_final_targets = final_targets_svm(p, :);
+q = randperm(length(final_inputs_svm));
+random_final_targets = final_targets_svm(q, :);
 
 % set some percentage of it aside for testing
 test_percent = 15;
@@ -39,14 +40,9 @@ CodingMat = SVMModel_Multi.CodingMatrix;
 
 
 % ######### Model Evaluation ##################################
-
-% predict using the test data extracted earlier
 targets_from_test_prediction = predict(SVMModel_Multi,test_inputs,'Verbose',1);
 
-% print out the Binary Loss function has been applied to the model ('hinge' by default)
 SVMModel_Multi.BinaryLoss
 
-% Plot Confusion Matrix
+%Plot Confusion Matrix
 confusionchart(test_targets,targets_from_test_prediction);
-
-

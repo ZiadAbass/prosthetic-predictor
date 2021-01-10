@@ -46,10 +46,10 @@ end
 % Split data into inputs and targets for ML
 % ----------------------------------------------
 % Define which features to include in the input set.
-inputs = final_labelled_data(:,1:end-5)';    % Take all the rows, and all the 10 features as inputs. Could also use: inputs = dataSet(:,1:end-2).
+final_inputs_nn = final_labelled_data(:,1:end-5)';    % Take all the rows, and all the 10 features as inputs. Could also use: inputs = dataSet(:,1:end-2).
 
 % Define the target set
-targets = final_labelled_data(:, end-4:end)'; % Take all the rows, and the last two columns as outputs. Could also use: targets = dataSet(:, end-1:end)
+final_targets_nn = final_labelled_data(:, end-4:end)'; % Take all the rows, and the last two columns as outputs. Could also use: targets = dataSet(:, end-1:end)
 
 
 
