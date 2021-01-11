@@ -3,6 +3,7 @@ Support vector machine
 %}
 
 clc
+load('svm_data.mat')
 
 % ######### Set aside some of the data for testing ##########
 
@@ -48,5 +49,19 @@ SVMModel_Multi.BinaryLoss
 
 % Plot Confusion Matrix
 confusionchart(test_targets,targets_from_test_prediction);
+
+
+%{
+now I have created new method for labelling data for SVMs as it is a different process 
+than that for ANNs. Created a multiclass SVM classifier for the data and 
+currently receiving 100% classification accuracy using the hinge binary loss 
+function. Will switch to assessing the classifier performance in a more robust way
+by obtaining the Posterior Probabilities.
+Explained
+openExample('stats/EstimatePosteriorProbabilitiesUsingECOCClassifiersExample')
+https://www.youtube.com/watch?v=FpKiHpYnY_I
+%}
+
+
 
 
