@@ -2,9 +2,8 @@
 This script also build a multiclass svm model, but evaluates it using 
 Posterior Probabilities
 %}
-%{
-clc
-load('svm_data.mat')
+
+% load('svm_data.mat')
 
 % ######### Set aside some of the data for testing ##########
 
@@ -45,18 +44,9 @@ SVMModel = fitcecoc(train_inputs,train_targets,'Learners',t,'FitPosterior',true,
 
 % Predict the training-sample labels and class posterior probabilities.
 [label,~,~,Posterior] = resubPredict(SVMModel,'Verbose',1);
-%}
-
-
-%{
-Print out the binary loss function.
-It is quadratic since posterior probabilities are being found by all the binary learners
-%}
-SVMModel.BinaryLoss
 
 % obtain a random sample from the data
 idx = randsample(size(train_inputs,1),10,1);
-SVMModel.ClassNames
 
 % generate a table showing the predicted label and the 
 % posterior probabilites of the sample data. 
@@ -65,40 +55,79 @@ table(train_targets(idx),label(idx),Posterior(idx,:),...
     'VariableNames',{'TrueLabel','PredLabel','Posterior'})
 
 
-
+% ######### Model Evaluation ##################################
 
 %{
-Define a grid of values in the observed predictor space. 
-Predict the posterior probabilities for each instance in the grid.
+Predict the posterior probabilities for each instance in the test data.
 %}
-xMax = max(train_inputs);
-xMin = min(train_inputs);
+[~,~,~,TestSamplePosteriorRegion] = predict(SVMModel,test_inputs);
 
-x1Pts = linspace(xMin(1),xMax(1));
-x2Pts = linspace(xMin(2),xMax(2));
-[x1Grid,x2Grid] = meshgrid(x1Pts,x2Pts);
+% Convert the Nx5 TestSamplePosteriorRegion matrix into an Nx1 array
+% with the index number of the class with the highest posterior prob.
+[~,I] = max(TestSamplePosteriorRegion, [],2);
 
-[~,~,~,PosteriorRegion] = predict(SVMModel,[x1Grid(:),x2Grid(:)]);
+% Translate each class number into a string representing the class
+sets_for_labels = [{'LGW'} {'RA'} {'RD'} {'SiS'} {'StS'}];
+for ii=1 : length(I)
+    targets_from_posterior_test_prediction(ii,1) = sets_for_labels(I(ii,1));
+end
 
+% Plot Confusion Matrix
+cm = confusionchart(test_targets,targets_from_posterior_test_prediction,...
+    'Title', 'Confusion Matrix for SVM based on Posterior Prediction',...
+    'RowSummary', 'absolute',...
+    'ColumnSummary', 'absolute');
+
+% Calculate the classification accuracy from the confusion matrix
+% Need to first obtain the number of correct classifications, this will
+% be equal to the sum of the values in the diagonal of the CM
+confusionMatrixResults = cm.NormalizedValues;
+correct_predictions = 0;
+for ii=1 : length(confusionMatrixResults)
+    correct_predictions = correct_predictions + confusionMatrixResults(ii,ii);
+end
+accuracy = (correct_predictions/length(test_targets))*100;
+
+fprintf("\nModel accuracy: %f\n", accuracy)
+fprintf("\nModel binary loss: %s\n\n", SVMModel.BinaryLoss)
+% Binary Loss is quadratic since posterior probabilities are 
+% being found by all the binary learners
+
+%{ 
+We can see that the confusion matrix produced by the SVM model using 
+posterior probability does not show 100% classification accuracy like the
+one produced when the SVM was evaluated normally. 
+This way of evaluating the SVM model is more robust.
+%}
+
+%{ 
+TODO (Optional): Fix this section to visaulise max class posterior probability, 
+see end of openExample('stats/EstimatePosteriorProbabilitiesUsingECOCClassifiersExample')
+for an example
 
 %{
 For each coordinate on the grid, plot the maximum class posterior probability among all classes.
 %}
-contourf(x1Grid,x2Grid,...
-        reshape(max(PosteriorRegion,[],2),size(x1Grid,1),size(x1Grid,2)));
+maxi = max(TestSamplePosteriorRegion,[],2);
+size1 = size(test_inputs,1);
+size2 = size(test_inputs,2);
+hamada = reshape(maxi,size2,size1);
+contourf(test_inputs(:,1),test_inputs(:,2),maxi);
+
 h = colorbar;
 h.YLabel.String = 'Maximum posterior';
 h.YLabel.FontSize = 15;
 
 hold on
-gh = gscatter(train_inputs(:,1),train_inputs(:,2),train_targets,'krk','*xd',8);
+gh = gscatter(X(:,1),X(:,2),Y,'krk','*xd',8);
 gh(2).LineWidth = 2;
 gh(3).LineWidth = 2;
 
-title('Activity classifier & Maximum Posterior')
+title('Iris Petal Measurements and Maximum Posterior')
 xlabel('Petal length (cm)')
 ylabel('Petal width (cm)')
 axis tight
 legend(gh,'Location','NorthWest')
 hold off
-    
+%}
+

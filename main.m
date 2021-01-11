@@ -16,3 +16,8 @@ fprintf("\n--------\nRunning label_data...\n--------\n")
 label_data_nn
 label_data_svm
 clearvars -except final_labelled_data final_inputs_nn final_targets_nn final_inputs_svm final_targets_svm
+fprintf("\n--------\nRunning nn_manual_test...\n--------\n")
+% nn_manual_test
+clc
+fprintf("\n--------\nRunning svm_posterior...\n--------\n")
+svm_posterior
