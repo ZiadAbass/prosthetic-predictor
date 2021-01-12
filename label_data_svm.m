@@ -7,9 +7,6 @@ We also want to group all of the data into a single table after labelling
 it.
 %}
 
-clc
-load('array_per_activity_nomagnet.mat')
-
 % array containing the names of the activities. 
 % These names will match the field names in the struct
 sets = ["LGW","RA","RD","SiS","StS"];

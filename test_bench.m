@@ -1,3 +1,7 @@
+
+
+
+%{
 load('posterior_svm.mat')
 
 % Convert the Nx5 TestSamplePosteriorRegion matrix into an Nx1 array
@@ -30,28 +34,4 @@ fprintf("\nModel accuracy: %f\n", accuracy)
 fprintf("\nModel binary loss: %s\n\n", SVMModel.BinaryLoss)
 % Binary Loss is quadratic since posterior probabilities are 
 % being found by all the binary learners
-
-%{
-load('EstimatePosteriorExample.mat')
-
-maxi = max(PosteriorRegion,[],2);
-size1 = size(x1Grid,1);
-size2 = size(x1Grid,2);
-hamada = reshape(maxi,size1,size2);
-contourf(x1Grid,x2Grid,hamada);
-h = colorbar;
-h.YLabel.String = 'Maximum posterior';
-h.YLabel.FontSize = 15;
-
-hold on
-gh = gscatter(X(:,1),X(:,2),Y,'krk','*xd',8);
-gh(2).LineWidth = 2;
-gh(3).LineWidth = 2;
-
-title('Iris Petal Measurements and Maximum Posterior')
-xlabel('Petal length (cm)')
-ylabel('Petal width (cm)')
-axis tight
-legend(gh,'Location','NorthWest')
-hold off
 %}
