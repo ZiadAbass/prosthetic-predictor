@@ -24,6 +24,12 @@ sorted_labels = feature_labels(idx,1);
 fprintf("\nMost significant 15 features:\n  ")
 sorted_labels
 
+% take only the top rated 15 rows from the NN data
+fifteen_features_inputs_nn = final_inputs_nn(idx,:);
+
+% take only the top rated 15 rows from the SVM data
+fifteen_features_inputs_svm = final_inputs_svm(:,idx);
+
 % need to convert the table to a cell array to show feature names in the
 % plot
 sorted_labels_cell = table2cell(sorted_labels);	
@@ -34,3 +40,7 @@ X = reordercats(X,sorted_labels_cell);
 Y = scores(idx);
 % plot the bar chart showing the most significant 15 features
 bar(X,Y)
+
+
+clearvars -except sorted_labels sorted_labels_cell fifteen_features_inputs_svm fifteen_features_inputs_nn final_targets_nn final_targets_svm
+
