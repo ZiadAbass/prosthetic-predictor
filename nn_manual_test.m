@@ -6,7 +6,7 @@ model to test it manually.
 
 clc
 
-load("inputs_targets.mat")
+% load("inputs_targets.mat")
 
 % Define number of neurons for the hidden layer of the NN
 hiddenLayerSize = 10;

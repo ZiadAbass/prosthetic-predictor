@@ -26,7 +26,9 @@ sorted_labels
 
 % take only the top rated 15 rows from the NN data
 fifteen_features_inputs_nn = final_inputs_nn(idx,:);
-fifteen_features_labelled_data = final_labelled_data(:,idx);
+class_labels = final_labelled_data(:,end-4:end);
+fifteen_features_unlabelled = final_labelled_data(:,idx);
+fifteen_features_labelled_data = horzcat(fifteen_features_unlabelled, class_labels);
 
 % take only the top rated 15 rows from the SVM data
 fifteen_features_inputs_svm = final_inputs_svm(:,idx);
@@ -41,7 +43,4 @@ X = reordercats(X,sorted_labels_cell);
 Y = scores(idx);
 % plot the bar chart showing the most significant 15 features
 bar(X,Y)
-
-
-clearvars -except sorted_labels sorted_labels_cell fifteen_features_inputs_svm fifteen_features_inputs_nn fifteen_features_labelled_data final_targets_nn final_targets_svm
 
