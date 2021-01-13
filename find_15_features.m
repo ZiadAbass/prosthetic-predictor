@@ -26,6 +26,7 @@ sorted_labels
 
 % take only the top rated 15 rows from the NN data
 fifteen_features_inputs_nn = final_inputs_nn(idx,:);
+fifteen_features_labelled_data = final_labelled_data(:,idx);
 
 % take only the top rated 15 rows from the SVM data
 fifteen_features_inputs_svm = final_inputs_svm(:,idx);
@@ -42,5 +43,5 @@ Y = scores(idx);
 bar(X,Y)
 
 
-clearvars -except sorted_labels sorted_labels_cell fifteen_features_inputs_svm fifteen_features_inputs_nn final_targets_nn final_targets_svm
+clearvars -except sorted_labels sorted_labels_cell fifteen_features_inputs_svm fifteen_features_inputs_nn fifteen_features_labelled_data final_targets_nn final_targets_svm
 
