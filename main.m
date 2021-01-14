@@ -71,6 +71,9 @@ svm_posterior(segment_features_inputs_svm, final_targets_svm)
 TODO:
 - Compare the networks with all features vs with only 15 features vs with a
 single segment?
+- Datasets are final_inputs_svm and final_labelled_data. Do we really need
+to keep them separate? Should only keep final_labelled_data and strip off
+the last 5 columns inside the svm function?
 %}
 
 
