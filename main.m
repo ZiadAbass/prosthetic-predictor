@@ -39,3 +39,11 @@ clearvars -except sorted_labels sorted_labels_cell fifteen_features_inputs_svm f
 
 fprintf("\n--------\n Training the SVM using 15 features...\n--------\n")
 svm_posterior(fifteen_features_inputs_svm, final_targets_svm)
+
+
+%{
+TODO:
+- Standardise data before training ANN (happens with SVM)
+- make sure test data is standardised (for both ANN and SVM)
+- Compare the networks with all features vs with only 15 features
+%}

@@ -27,6 +27,7 @@ close all;  % close all popup windows
 % ----------------------------------------------
 % Loop through all of the raw_data, extract max, min, mean, standard
 % deviation and RMS.
+fprintf("\nExtracting time domain features...\n")
 % ----------------------------------------------
 % array containing the names of the activities. 
 % These names will match the field names in the struct
@@ -54,7 +55,9 @@ for ff = 1 : length(sets)
         dataset_features = {maxV, min, mean, stdD, rms};
         % assign all the features to a single new struct
         for w = 1 : length(dataset_features)
-            % reduce the data using the required time interval
+            % reduce the data using the required time interval. 
+            % We want to extract only every Nth row to match our time
+            % interval. The 'interval' var defines N.
             [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w});
             temp_processed_data(1).(features{w}) = reduced_data; 
         end
@@ -64,6 +67,7 @@ end
 
 % ----------------------------------------------
 % Loop through all of the raw_data, extract Zero Crossing.
+fprintf("\nManually extracting Zero Crossing...\n")
 % ----------------------------------------------
 % extract zero crossing for the data and add to the same processed_data
 % struct
@@ -114,43 +118,40 @@ for ff = 1 : length(sets)
                 % increasing by increments of 5.
                 if zc
                     zc_column(((r-1)/interval)+1) = 1;   % if r going in 5s
-%                     zc_column(r) = 1;               % if r going in 1s
                 else
                     zc_column(((r-1)/interval)+1) = 0;   % if r going in 5s
-%                     zc_column(r) = 0;               % if r going in 1s
                 end
                 zc = false;
             end
             % append the zc_column to the existing zc table
             zc_dataset(:,ii) = zc_column;
-            % <add zc_feature>
         end
         processed_data(kk).(sets{ff})(1).ZC = zc_dataset;
     end
 end
 
 % ----------------------------------------------
-% Loop through all of the raw_data, extract Zero Crossing.
-% NOTE: This is temporary until max slope change is fixed
+% Loop through all of the raw_data, extract maximum slope change.
+fprintf("\nManually extracting Maximum slope change...\n")
 % ----------------------------------------------
-% extract zero crossing for the data and add to the same processed_data
+% extract maximum slope for the data and add to the same processed_data
 % struct
 % loop through each of the folders
 for ff = 1 : length(sets)
     for kk = 1 : length(raw_data)
-        % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
+%         fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
         current_dataset = raw_data(kk).(sets{ff});
         current_dataset_without_timestamp = current_dataset(:,2:end);
+        current_timestamp = table2array(current_dataset(:,1));
         % Filter the data
         % loop through the columns in the single dataset
-        clearvars zc_dataset
+        clearvars ms_dataset
         for ii = 1 : width(current_dataset_without_timestamp)
+%             fprintf("\nDone %i of %i columns in this dataset", ii, width(current_dataset_without_timestamp))
             % obtain the relevant column
             colm = table2array(current_dataset_without_timestamp(1:end,ii));
-            % calculate zero crossing manually
-            % (for each window, 1 if a ZC exists, 0 if not)
-            zc = false;
-            clearvars zc_column
+            % calculate max slope change manually
+            clearvars ms_column
             % loop through the column
             for r = 1 : interval :length(colm)   % change 5 to change interval
             % for r = 1 :length(colm)
@@ -158,101 +159,35 @@ for ff = 1 : length(sets)
                     % if the column is smaller than the window size then
                     % take the whole column
                     h = colm;
+                    timeColum = current_timestamp;
                 elseif r > (length(colm)-((window/2)+1))
                     % if towards the end of the column, window/2 values
                     % before r and all values after it.
                     h = colm(r-(window/2):end);
+                    timeColum = current_timestamp(r-(window/2):end);
                 elseif r < ((window/2)+1)
                     % if towards the start of the column, take all values
                     % before r and window/2 values after r
                     h = colm(1:r+(window/2));
+                    timeColum = current_timestamp(1:r+(window/2));
                 else
                     % under normal conditions, take window/2 values before
                     % r and window/2 values after it
                     h = colm(r-(window/2):r+(window/2));
+                    timeColum = current_timestamp(r-(window/2):r+(window/2));
                 end
-                % loop through h and see if a ZC exists
-                for rr = 1 : length(h)-1
-                    if (h(rr)*h(rr+1))<0
-                        zc = true;
-                    end
-                end
-                % if we had found a ZC then we want to assign 1, if not
-                % then 0. Indexing (((r-1)/5)+1) instead of r as r is
-                % increasing by increments of 5.
-                if zc
-                    zc_column(((r-1)/interval)+1) = 1;   % if r going in 5s
-%                     zc_column(r) = 1;               % if r going in 1s
-                else
-                    zc_column(((r-1)/interval)+1) = 0;   % if r going in 5s
-%                     zc_column(r) = 0;               % if r going in 1s
-                end
-                zc = false;
+                % gradient() finds the slope change between consequetive
+                % data points. 
+                dydx = gradient(h) ./ gradient(timeColum);
+                % we now need to find the differences between consequtive
+                % gradients, then find the maximum value i.e. max slope
+                % change
+                maxSlopeChange = max(diff(dydx));
+                ms_column(((r-1)/5)+1) = maxSlopeChange;   % r going in increments
             end
-            % append the zc_column to the existing zc table
-            zc_dataset(:,ii) = zc_column;
-            % <add zc_feature>
+            % append the ms_column to the existing msc table
+            ms_dataset(:,ii) = ms_column;
         end
-        processed_data(kk).(sets{ff})(1).MSC = zc_dataset;
+        processed_data(kk).(sets{ff})(1).MSC = ms_dataset;
     end
 end
-
-%{
-% ----------------------------------------------
-% Loop through all of the raw_data, extract maximum slope change.
-% ----------------------------------------------
-% extract maximum slope for the data and add to the same processed_data
-% struct
-% loop through each of the folders
-for ff = 1 : length(sets)
-    for kk = 1 : length(raw_data)
-        fprintf("\nkk is %i, ff is %i, in set %s\n", kk, ff, sets(ff))
-        current_dataset = raw_data(kk).(sets{ff});
-        % Filter the data
-        % loop through the columns in the single dataset
-        clearvars ms_dataset
-        for ii = 1 : width(current_dataset)
-            fprintf("\nDone %i of %i columns in this dataset", ii, width(current_dataset))
-            % obtain the relevant column
-            colm = table2array(current_dataset(1:end,ii));
-            % calculate zero crossing manually
-            % (for each window, 1 if a ZC exists, 0 if not)
-            zc = false;
-            clearvars ms_column
-            window = 400;
-            % loop through the column
-            % for r = 1 : 5 :length(colm)   % change 5 to change interval
-            for r = 1 :length(colm)
-                if length(colm) < (window+2)
-                    % if the column is smaller than the window size then
-                    % take the whole column
-                    h = colm;
-                elseif r > (length(colm)-((window/2)+1))
-                    % if towards the end of the column, window/2 values
-                    % before r and all values after it.
-                    h = colm(r-(window/2):end);
-                elseif r < ((window/2)+1)
-                    % if towards the start of the column, take all values
-                    % before r and window/2 values after r
-                    h = colm(1:r+(window/2));
-                else
-                    % under normal conditions, take window/2 values before
-                    % r and window/2 values after it
-                    h = colm(r-(window/2):r+(window/2));
-                end
-                h = h.';
-                % loop through h and find max slope change
-                % max_slope = findchangepts(h,'Statistic','linear','MaxNumChanges',1);
-                [TF,slopes] = ischange(h,'linear','Threshold',200);
-                % fprintf("\nYes done %i of %i", r, length(colm))
-                max_slope = max(slopes, [], 'all');
-                % zc_column(((r-1)/5)+1) = 1;   % if r going in 5s
-                ms_column(r) = max_slope;       % if r going in 1s
-            end
-            % append the zc_column to the existing zc table
-            % ms_dataset(:,ii) = ms_column;
-        end
-        % processed_data(kk).(sets{ff})(1).ZC = ms_dataset;
-    end
-end
-%}
