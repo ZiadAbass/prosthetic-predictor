@@ -6,6 +6,8 @@ It extracts these 15 features and plots a labelled bar graph of their scores.
 
 %}
 
+% labels.csv contains all the class labels in english in the same order 
+% that they appear in the data
 feature_labels = readtable("labels.csv", "ReadVariableNames",true, 'Delimiter','comma');
 
 % run the minimum redundancy maximum relevance algorithm to order the 294

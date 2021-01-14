@@ -13,16 +13,27 @@ function []=nn_manual(inputLabelledData)
     % Create a Pattern Recognition Network with the defined number of hidden layers.
     % `patternnet` is specific for pattern-recognition NNs
     net = patternnet(hiddenLayerSize);
+    %{
+    patternnet() is specialized for pattern recognition problems. 
+    - Default training algo: Scaled conjugate gradient backpropagation (trainscg). 
+        * trainscg's goal: minimize a cost function.
+    - Default loss cost function: Cross-entropy.
+        * This function measures the performance of a classification model whose 
+        output varies between 0 and 1. 
+        * Cross-entropy loss increases as the prediction probability diverges 
+        from the output value. 
+        * Therefore, small values -> good performance, large values -> bad performance.
+    %}
 
     % Set up Division of Data for Training, Validation, Testing Subsets
     net.divideParam.trainRatio = 85/100;
     net.divideParam.valRatio = 15/100;
+    test_percent = 15;
 
     % before splitting into inputs and targets shuffle the rows
     random_final_labelled_data = inputLabelledData(randperm(size(inputLabelledData, 1)), :);
 
     % set some percentage of it aside for testing
-    test_percent = 15;
     test_element_count = uint32((test_percent/100)*length(random_final_labelled_data));
 
     % Define which features to include in the input set.
