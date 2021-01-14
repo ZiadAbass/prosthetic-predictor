@@ -4,7 +4,7 @@ Posterior Probabilities
 %}
 
 function []=svm_posterior(svmInputs, svmTargets)
-
+    
     % ######### Set aside some of the data for testing ##########
 
     % We want to shuffle both inputs and outputs while preserving the
@@ -12,6 +12,12 @@ function []=svm_posterior(svmInputs, svmTargets)
     p = randperm(length(svmInputs));
     random_final_inputs = svmInputs(p, :);
     random_final_targets = svmTargets(p, :);
+    
+    % Standardise and normalise the input data.
+    % normalize() normalises the data such that the center is 0 and the 
+    % standard deviation is 1. Function normalises each column by default.
+    % 'range' makes all the values be between 0 and 1.
+    random_final_inputs = normalize(random_final_inputs, 'range');
 
     % set some percentage of it aside for testing
     test_percent = 15;

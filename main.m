@@ -43,6 +43,7 @@ svm_posterior(fifteen_features_inputs_svm, final_targets_svm)
 
 %{
 TODO:
+- Display confusion matrix results at end of nn_manual.m
 - Standardise data before training ANN (happens with SVM)
 - make sure test data is standardised (for both ANN and SVM)
 - Compare the networks with all features vs with only 15 features

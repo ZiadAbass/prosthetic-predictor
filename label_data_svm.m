@@ -14,9 +14,7 @@ sets = ["LGW","RA","RD","SiS","StS"];
 sets_for_labels = [{'LGW'} {'RA'} {'RD'} {'SiS'} {'StS'}];
 
 % ----------------------------------------------
-% Label the data by adding an extra 5 columns at the end of
-% each activity array. Only the column corresponding to the 
-% activity consists of 1's - the rest are all 0's.
+% Label the data by having a single column dedicated for string class labels
 % ----------------------------------------------
 for ff = 1 : length(sets)
     % obtain the number of rows in the current dataset
