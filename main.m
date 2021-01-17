@@ -1,30 +1,38 @@
-clear
-clc
 
+clear;      % clear the workspace
+clc;        % clear the command window
+close all;  % close all popup windows
 
 % ======================================
 % ================ TASK 1 ==============
 % ======================================
 
 fprintf("\n--------\n Importing the data...\n--------\n")
-new_import_datasets;
+% new_import_datasets;
+raw_data = new_import_datasets();
 
 fprintf("\n--------\n Filtering the data...\n--------\n")
-filter_data;
+% filter_data;
+raw_data = filter_data(raw_data);
 
 fprintf("\n--------\n Extracting the time-domain features...\n--------\n")
-extract_reduce_features;
-clearvars -except raw_data processed_data
+% extract_reduce_features;
+processed_data = extract_reduce_features(raw_data);
+% clearvars -except raw_data processed_data
 
 fprintf("\n--------\n Organising the features...\n--------\n")
-organise_features
-clearvars -except array_per_activity_nomagnet
+% organise_features
+array_per_activity_nomagnet = organise_features(processed_data);
+% clearvars -except array_per_activity_nomagnet
 
 fprintf("\n--------\n Labelling the data...\n--------\n")
-label_data_nn
-label_data_svm
-clearvars -except final_labelled_data final_inputs_nn final_targets_nn final_inputs_svm final_targets_svm
+% label_data_nn
+[final_labelled_data1, final_inputs_nn1, final_targets_nn1] = label_data_nn(array_per_activity_nomagnet);
+% label_data_svm
+[final_inputs_svm1, final_targets_svm1] = label_data_svm(array_per_activity_nomagnet);
+% clearvars -except final_labelled_data final_inputs_nn final_targets_nn final_inputs_svm final_targets_svm
 
+%{
 fprintf("\n--------\n Training the ANN using all the features...\n--------\n")
 nn_manual(final_labelled_data)
 clearvars -except final_labelled_data final_inputs_nn final_targets_nn final_inputs_svm final_targets_svm
@@ -71,12 +79,9 @@ svm_posterior(segment_features_labelled_data, final_targets_svm)
 TODO:
 - Compare the networks with all features vs with only 15 features vs with a
 single segment?
-- Datasets are final_inputs_svm and final_labelled_data. Do we really need
-to keep them separate? Should only keep final_labelled_data and strip off
-the last 5 columns inside the svm function?
 %}
 
-
+%}
 
 
 
