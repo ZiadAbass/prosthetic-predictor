@@ -3,9 +3,13 @@ This script builds a multiclass svm model and evaluates it using
 Posterior Probabilities
 %}
 
-function []=svm_posterior(svmInputs, svmTargets)
+function []=svm_posterior(labelledData, svmTargets)
     
     % ######### Set aside some of the data for testing ##########
+    
+    % extract only the inputs from the labelled data. The SVM targets are
+    % separately given
+    svmInputs = labelledData(:,1:end-5);
 
     % We want to shuffle both inputs and outputs while preserving the
     % correlation

@@ -5,7 +5,7 @@ It extracts all of the segment's information from the data, and returns the
 dataset after reducing it to only data from that segment.
 %}
 
-function [segment_features_labelled_data, segment_features_inputs_svm]=extract_segment(keyword, final_labelled_data, final_inputs_svm)
+function [segment_features_labelled_data]=extract_segment(keyword, final_labelled_data)
 
     % define the body part we are looking for
 
@@ -31,13 +31,11 @@ function [segment_features_labelled_data, segment_features_inputs_svm]=extract_s
 
     end
 
-    % extract just the segment's columns from the data (NN data)
+    % extract just the segment's columns from the labelled data
     class_labels = final_labelled_data(:,end-4:end);
     segment_features_unlabelled = final_labelled_data(:,sig_indexes);
     segment_features_labelled_data = horzcat(segment_features_unlabelled, class_labels);
 
-    % extract just the segment's columns from the data (SVM data)
-    segment_features_inputs_svm = final_inputs_svm(:,sig_indexes);
 end
 
 
