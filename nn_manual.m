@@ -28,7 +28,7 @@ function []=nn_manual(inputLabelledData)
     % Set up Division of Data for Training, Validation, Testing Subsets
     net.divideParam.trainRatio = 85/100;
     net.divideParam.valRatio = 15/100;
-    test_percent = 15;
+    test_percent = 50;
 
     % before splitting into inputs and targets shuffle the rows
     random_final_labelled_data = inputLabelledData(randperm(size(inputLabelledData, 1)), :);

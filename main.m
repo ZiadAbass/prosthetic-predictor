@@ -28,7 +28,7 @@ nn_manual(final_labelled_data)
 close all
 
 fprintf("\n--------\n Training the SVM using all the features...\n--------\n")
-% svm_posterior(final_labelled_data, final_targets_svm)
+svm_posterior(final_labelled_data, final_targets_svm)
 
 
 % ======================================
@@ -52,7 +52,7 @@ fprintf("\n--------\n Training the SVM using 15 features...\n--------\n")
 % ======================================
 
 fprintf("\n--------\n Finding features from a single segment...\n--------\n")
-[segment_features_labelled_data] = extract_segment("Thigh", final_labelled_data);
+[segment_features_labelled_data] = extract_segment("foor_r", final_labelled_data);
 
 % ======================================
 % ================ TASK 4 ==============

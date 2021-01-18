@@ -48,10 +48,10 @@ function []=svm_posterior(labelledData, svmTargets)
     - 'ClassNames'      -> To specify the class order.
     - 'Verbose'         -> To display diagnostic messages during training
     %}
-    fprintf("Training SVM binary learners...")
+    fprintf("Training SVM binary learners...\n")
     SVMModel = fitcecoc(train_inputs,train_targets,'Learners',t,'FitPosterior',true,...
         'ClassNames',{'LGW','RA','RD','SiS','StS'},...
-        'Verbose',0);
+        'Verbose',1);
 
     % Predict the training-sample labels and class posterior probabilities.
     [label,~,~,Posterior] = resubPredict(SVMModel,'Verbose',1);
@@ -68,6 +68,7 @@ function []=svm_posterior(labelledData, svmTargets)
 
     % ######### Model Evaluation ##################################
 
+    fprintf("\nEvaluating the SVM model...\n\n")
     %{
     Predict the posterior probabilities for each instance in the test data.
     %}
