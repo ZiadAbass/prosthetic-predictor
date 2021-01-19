@@ -5,10 +5,10 @@ model to test it manually.
 %}
 
 
-function []=nn_manual(inputLabelledData)
+function []=nn_manual(inputLabelledData, hiddenLayerSize, testDataPercentage)
 
     % Define number of neurons for the hidden layer of the NN
-    hiddenLayerSize = 10;
+    hiddenLayerSize = hiddenLayerSize;
 
     % Create a Pattern Recognition Network with the defined number of hidden layers.
     % `patternnet` is specific for pattern-recognition NNs
@@ -28,7 +28,7 @@ function []=nn_manual(inputLabelledData)
     % Set up Division of Data for Training, Validation, Testing Subsets
     net.divideParam.trainRatio = 85/100;
     net.divideParam.valRatio = 15/100;
-    test_percent = 50;
+    test_percent = 20;
 
     % before splitting into inputs and targets shuffle the rows
     random_final_labelled_data = inputLabelledData(randperm(size(inputLabelledData, 1)), :);
@@ -101,9 +101,11 @@ function []=nn_manual(inputLabelledData)
     end
     accuracy = (correct_predictions/length(test_targets))*100;
 
-    fprintf("\n-------------\nANN model accuracy using %i features: %f\n", size(inputLabelledData,2)-5, accuracy)
-    fprintf('Patternnet performance using %i features: %f\n', size(inputLabelledData,2)-5, tstPerform);
-    fprintf('num_epochs: %d, stop: %s\n-------------\n', tr.num_epochs, tr.stop);
+    fprintf("\n-------------\nSummary:\n    Test data: %i Percent\n    Hidden layer neurons: %i\n", testDataPercentage, hiddenLayerSize)
+    fprintf("    Number of features: %i \n", size(inputLabelledData,2)-5)
+    fprintf("    ANN classification accuracy %f\n", accuracy)
+    fprintf('    Patternnet performance: %f \n', tstPerform);
+    fprintf('    num_epochs: %d, stop: %s\n-------------\n\n', tr.num_epochs, tr.stop);
 
 end
 
