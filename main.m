@@ -52,7 +52,7 @@ svm_posterior(fifteen_features_labelled_data, final_targets_svm)
 % ======================================
 
 fprintf("\n--------\n Finding features from a single segment...\n--------\n")
-[segment_features_labelled_data] = extract_segment("foot_r", final_labelled_data);
+[segment_features_labelled_data, ~] = extract_segment("foot_r", final_labelled_data);
 
 % ======================================
 % ================ TASK 4 ==============
