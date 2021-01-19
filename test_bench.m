@@ -1,87 +1,219 @@
-% Define number of neurons for the hidden layer of the NN
-hiddenLayerSize = 10;
 
-% Create a Pattern Recognition Network with the defined number of hidden layers.
-% `patternnet` is specific for pattern-recognition NNs
-net = patternnet(hiddenLayerSize);
+close all;  % close all popup windows
 
-% Set up Division of Data for Training, Validation, Testing Subsets
-net.divideParam.trainRatio = 85/100;
-net.divideParam.valRatio = 15/100;
-
-% before splitting into inputs and targets shuffle the rows
-random_final_labelled_data = inputLabelledData(randperm(size(inputLabelledData, 1)), :);
-
-% set some percentage of it aside for testing
-test_percent = 15;
-test_element_count = uint32((test_percent/100)*length(random_final_labelled_data));
-
-% Define which features to include in the input set.
-train_inputs = random_final_labelled_data(1:end-test_element_count,1:end-5)';    % Take all the rows, and all the 10 features as inputs. Could also use: inputs = dataSet(:,1:end-2).
-test_inputs= random_final_labelled_data(end-test_element_count+1:end,1:end-5)';
-
-% Define the target set
-train_targets = random_final_labelled_data(1:end-test_element_count, end-4:end)'; 
-test_targets = random_final_labelled_data(end-test_element_count+1:end, end-4:end)'; 
-
-% Standardise and normalise the input data.
-% normalize() normalises the data such that the center is 0 and the 
-% standard deviation is 1. Function normalises each column by default.
-% 'range' makes all the values be between 0 and 1.
-train_inputs = normalize(train_inputs, 'range');
-test_inputs = normalize(test_inputs, 'range');
-
-% Train the Network
-[net, tr] = train(net, train_inputs, train_targets);
-
-% -----------------------
-% Test the Network with the test subset from the current dataset
-% -----------------------
-actualTstOutputs = net(test_inputs);
-
-%  compare the NN's predictions against the training set
-idealTstOutputs = test_targets;
-tstPerform = perform(net, idealTstOutputs, actualTstOutputs);
-
-sets_for_labels = [{'LGW'} {'RA'} {'RD'} {'SiS'} {'StS'}];
-
-% we need to convert the targets from Nx5 boolean values into a single 
-% string row/column to be able to run confusionchart
-for yy=1 : size(idealTstOutputs,2)
-    % get the 5 1/0 values representing the class label
-    current_ideal_class = idealTstOutputs(:,yy);
-    current_actual_class = actualTstOutputs(:,yy);
-    % find where the '1' is
-    [~,I_ideal] = max(current_ideal_class);
-    [~,I_actual] = max(current_actual_class);
-    % get the corresponding string value of the class label
-    idealTstOutputsSimplified(:,yy) = sets_for_labels(I_ideal);
-    actualTstOutputsSimplified(:,yy) = sets_for_labels(I_actual);
+% ----------------------------------------------
+% Loop through all of the raw_data, extract max, min, mean, standard
+% deviation and RMS.
+fprintf("\nExtracting time domain features...\n")
+% ----------------------------------------------
+% array containing the names of the activities. 
+% These names will match the field names in the struct
+sets = ["LGW","RA","RD","SiS","StS"];
+% array containing the names of the time domain features. 
+% These names will match the field names in the struct.
+features = ["MAX", "MIN", "AVG", "SD","RMS"];
+% size of the sliding window for extracting features in milliseconds
+window_duration = 400;
+Y = 0;
+% loop through each of the folders
+for ff = 1 : length(sets)
+    for kk = 1 : length(raw_data)
+%         fprintf("\nkk is %i, ff is %i\n", kk, ff)
+        current_dataset = table2array(raw_data(kk).(sets{ff}));
+        current_dataset_without_timestamp = current_dataset(:,2:end);
+        current_timestamp = current_dataset(:,1);
+        
+        % -------------------------------------------------------
+        % We should not assume that the timestep between samples is fixed.
+        % Therefore, we find the average timestep for every dataset and
+        % change the window size accordingly.
+        
+        % find the average timestep between rows
+        avg_timestep = mean(diff(current_timestamp));
+        % in case the timestep is in seconds rather than milliseconds
+        if avg_timestep < 1
+            avg_timestep = avg_timestep*1000;
+        end
+        % `window_size` defines the number of readings in each window
+        window_size = int32(window_duration/avg_timestep);
+        %-------------------------------------------------------
+        
+        % extract time domain features from each dataset
+        smean = movmean(current_dataset_without_timestamp, window_size);
+        stdD = movstd(current_dataset_without_timestamp, window_size);
+        maxV = movmax(current_dataset_without_timestamp, window_size);
+        min = movmin(current_dataset_without_timestamp, window_size);
+        rms = sqrt(movmean(current_dataset_without_timestamp .^ 2, window_size));
+        % group all the features
+        dataset_features = {maxV, min, smean, stdD, rms};
+        % assign all the features to a single new struct
+        for w = 1 : length(dataset_features)
+            % reduce the data using the required time interval. 
+            % We want to extract only every Nth row to match our time
+            % interval. The 'interval' var defines N.
+            [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w});
+            temp_processed_data(1).(features{w}) = reduced_data; 
+        end
+        processed_data(kk).(sets{ff}) = temp_processed_data;
+    end
 end
-% create the confusion matrix object to show and retrieve
-% classification accuracy from
-plotTitle = sprintf('ANN Confusion Matrix for %i features',size(inputLabelledData,2)-5);
-cm = confusionchart(idealTstOutputsSimplified,actualTstOutputsSimplified,...
-    'Title', plotTitle,...
-    'RowSummary', 'absolute',...
-    'ColumnSummary', 'absolute');
 
-%  plot the confusion matrix
-% numFeatures = sprintf('%i features',size(inputLabelledData,2)-5);
-% hold off
-% plotconfusion(idealTstOutputs,actualTstOutputs,numFeatures);
 
-% Calculate the classification accuracy from the confusion matrix
-% Need to first obtain the number of correct classifications, this will
-% be equal to the sum of the values in the diagonal of the CM
-confusionMatrixResults = cm.NormalizedValues;
-correct_predictions = 0;
-for ii=1 : length(confusionMatrixResults)
-    correct_predictions = correct_predictions + confusionMatrixResults(ii,ii);
+% ----------------------------------------------
+% Loop through all of the raw_data, extract Zero Crossing.
+fprintf("\nManually extracting Zero Crossing...\n")
+% ----------------------------------------------
+% extract zero crossing for the data and add to the same processed_data
+% struct
+% loop through each of the folders
+for ff = 1 : length(sets)
+    for kk = 1 : length(raw_data)
+        % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
+        current_dataset = raw_data(kk).(sets{ff});
+        current_dataset_without_timestamp = current_dataset(:,2:end);
+        current_timestamp = table2array(current_dataset(:,1));
+        % -------------------------------------------------------
+        % We should not assume that the timestep between samples is fixed.
+        % Therefore, we find the average timestep for every dataset and
+        % change the window size accordingly.
+        
+        % find the average timestep between rows
+        avg_timestep = mean(diff(current_timestamp));
+        % in case the timestep is in seconds rather than milliseconds
+        if avg_timestep < 1
+            avg_timestep = avg_timestep*1000;
+        end
+        % `window_size` defines the number of readings in each window
+        window_size = int16(window_duration/avg_timestep);
+        half_window_size = int16(window_size/2);
+        %-------------------------------------------------------
+        % Filter the data
+        % loop through the columns in the single dataset
+        clearvars zc_dataset
+        for ii = 1 : width(current_dataset_without_timestamp)
+            % obtain the relevant column
+            colm = table2array(current_dataset_without_timestamp(1:end,ii));
+            % calculate zero crossing manually
+            % (for each window, 1 if a ZC exists, 0 if not)
+            zc = false;
+            clearvars zc_column
+            % loop through the column
+            for r = 1 : interval :length(colm)   % change 5 to change interval
+            % for r = 1 :length(colm)
+                if length(colm) < (window_size+2)
+                    % if the column is smaller than the window size then
+                    % take the whole column
+                    h = colm;
+                elseif r > (length(colm)-(half_window_size+1))
+                    % if towards the end of the column, window/2 values
+                    % before r and all values after it.
+                    h = colm(r-half_window_size:end);
+                elseif r < (half_window_size+1)
+                    % if towards the start of the column, take all values
+                    % before r and window/2 values after r
+                    h = colm(1:r+half_window_size);
+                else
+                    % under normal conditions, take window/2 values before
+                    % r and window/2 values after it
+                    h = colm(r-half_window_size:r+half_window_size);
+                end
+                % loop through h and see if a ZC exists
+                for rr = 1 : length(h)-1
+                    if (h(rr)*h(rr+1))<0
+                        zc = true;
+                    end
+                end
+                % if we had found a ZC then we want to assign 1, if not
+                % then 0. Indexing (((r-1)/5)+1) instead of r as r is
+                % increasing by increments of 5.
+                if zc
+                    zc_column(((r-1)/interval)+1) = 1;   % if r going in 5s
+                else
+                    zc_column(((r-1)/interval)+1) = 0;   % if r going in 5s
+                end
+                zc = false;
+            end
+            % append the zc_column to the existing zc table
+            zc_dataset(:,ii) = zc_column;
+        end
+        processed_data(kk).(sets{ff})(1).ZC = zc_dataset;
+    end
 end
-accuracy = (correct_predictions/length(test_targets))*100;
 
-fprintf("\n-------------\nANN model accuracy using %i features: %f\n", size(inputLabelledData,2)-5, accuracy)
 
-fprintf('\nPatternnet performance using %i features: %f\n', size(inputLabelledData,2)-5, tstPerform);
-fprintf('num_epochs: %d, stop: %s\n-------------\n', tr.num_epochs, tr.stop);
+% ----------------------------------------------
+% Loop through all of the raw_data, extract maximum slope change.
+fprintf("\nManually extracting Maximum slope change...\n")
+% ----------------------------------------------
+% extract maximum slope for the data and add to the same processed_data
+% struct
+% loop through each of the folders
+for ff = 1 : length(sets)
+    for kk = 1 : length(raw_data)
+%         fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
+        current_dataset = raw_data(kk).(sets{ff});
+        current_dataset_without_timestamp = current_dataset(:,2:end);
+        current_timestamp = table2array(current_dataset(:,1));
+        % -------------------------------------------------------
+        % We should not assume that the timestep between samples is fixed.
+        % Therefore, we find the average timestep for every dataset and
+        % change the window size accordingly.
+        
+        % find the average timestep between rows
+        avg_timestep = mean(diff(current_timestamp));
+        % in case the timestep is in seconds rather than milliseconds
+        if avg_timestep < 1
+            avg_timestep = avg_timestep*1000;
+        end
+        % `window_size` defines the number of readings in each window
+        window_size = int16(window_duration/avg_timestep);
+        half_window_size = int16(window_size/2);
+        %-------------------------------------------------------
+        % Filter the data
+        % loop through the columns in the single dataset
+        clearvars ms_dataset
+        for ii = 1 : width(current_dataset_without_timestamp)
+%             fprintf("\nDone %i of %i columns in this dataset", ii, width(current_dataset_without_timestamp))
+            % obtain the relevant column
+            colm = table2array(current_dataset_without_timestamp(1:end,ii));
+            % calculate max slope change manually
+            clearvars ms_column
+            % loop through the column
+            for r = 1 : interval :length(colm)   % change 5 to change interval
+            % for r = 1 :length(colm)
+                if length(colm) < (window_size+2)
+                    % if the column is smaller than the window size then
+                    % take the whole column
+                    h = colm;
+                    timeColum = current_timestamp;
+                elseif r > (length(colm)-(half_window_size+1))
+                    % if towards the end of the column, window/2 values
+                    % before r and all values after it.
+                    h = colm(r-half_window_size:end);
+                    timeColum = current_timestamp(r-half_window_size:end);
+                elseif r < (half_window_size+1)
+                    % if towards the start of the column, take all values
+                    % before r and window/2 values after r
+                    h = colm(1:r+half_window_size);
+                    timeColum = current_timestamp(1:r+half_window_size);
+                else
+                    % under normal conditions, take window/2 values before
+                    % r and window/2 values after it
+                    h = colm(r-half_window_size:r+half_window_size);
+                    timeColum = current_timestamp(r-half_window_size:r+half_window_size);
+                end
+                % gradient() finds the slope change between consequetive
+                % data points. 
+                dydx = gradient(h) ./ gradient(timeColum);
+                % we now need to find the differences between consequtive
+                % gradients, then find the maximum value i.e. max slope
+                % change
+                maxSlopeChange = max(diff(dydx));
+                ms_column(((r-1)/5)+1) = maxSlopeChange;   % r going in increments
+            end
+            % append the ms_column to the existing msc table
+            ms_dataset(:,ii) = ms_column;
+        end
+        processed_data(kk).(sets{ff})(1).MSC = ms_dataset;
+    end
+end

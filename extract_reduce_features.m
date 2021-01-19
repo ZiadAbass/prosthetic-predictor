@@ -29,10 +29,8 @@ function processed_data = extract_reduce_features(raw_data)
     % array containing the names of the time domain features. 
     % These names will match the field names in the struct.
     features = ["MAX", "MIN", "AVG", "SD","RMS"];
-    % size of the sliding window for extracting features. 
-    % Our window is 400ms. Readings are 10ms apart and hence the window spans
-    % 40 readings.
-    window = 40;
+    % size of the sliding window for extracting features in milliseconds
+    window_duration = 400;
     Y = 0;
     % loop through each of the folders
     for ff = 1 : length(sets)
@@ -41,14 +39,30 @@ function processed_data = extract_reduce_features(raw_data)
             current_dataset = table2array(raw_data(kk).(sets{ff}));
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = current_dataset(:,1);
+
+            % -------------------------------------------------------
+            % We should not assume that the timestep between samples is fixed.
+            % Therefore, we find the average timestep for every dataset and
+            % change the window size accordingly.
+
+            % find the average timestep between rows
+            avg_timestep = mean(diff(current_timestamp));
+            % in case the timestep is in seconds rather than milliseconds
+            if avg_timestep < 1
+                avg_timestep = avg_timestep*1000;
+            end
+            % `window_size` defines the number of readings in each window
+            window_size = int32(window_duration/avg_timestep);
+            %-------------------------------------------------------
+
             % extract time domain features from each dataset
-            mean = movmean(current_dataset_without_timestamp, window);
-            stdD = movstd(current_dataset_without_timestamp, window);
-            maxV = movmax(current_dataset_without_timestamp, window);
-            min = movmin(current_dataset_without_timestamp, window);
-            rms = sqrt(movmean(current_dataset_without_timestamp .^ 2, window));
+            smean = movmean(current_dataset_without_timestamp, window_size);
+            stdD = movstd(current_dataset_without_timestamp, window_size);
+            maxV = movmax(current_dataset_without_timestamp, window_size);
+            min = movmin(current_dataset_without_timestamp, window_size);
+            rms = sqrt(movmean(current_dataset_without_timestamp .^ 2, window_size));
             % group all the features
-            dataset_features = {maxV, min, mean, stdD, rms};
+            dataset_features = {maxV, min, smean, stdD, rms};
             % assign all the features to a single new struct
             for w = 1 : length(dataset_features)
                 % reduce the data using the required time interval. 
@@ -60,6 +74,7 @@ function processed_data = extract_reduce_features(raw_data)
             processed_data(kk).(sets{ff}) = temp_processed_data;
         end
     end
+
 
     % ----------------------------------------------
     % Loop through all of the raw_data, extract Zero Crossing.
@@ -73,6 +88,22 @@ function processed_data = extract_reduce_features(raw_data)
             % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
             current_dataset = raw_data(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
+            current_timestamp = table2array(current_dataset(:,1));
+            % -------------------------------------------------------
+            % We should not assume that the timestep between samples is fixed.
+            % Therefore, we find the average timestep for every dataset and
+            % change the window size accordingly.
+
+            % find the average timestep between rows
+            avg_timestep = mean(diff(current_timestamp));
+            % in case the timestep is in seconds rather than milliseconds
+            if avg_timestep < 1
+                avg_timestep = avg_timestep*1000;
+            end
+            % `window_size` defines the number of readings in each window
+            window_size = int16(window_duration/avg_timestep);
+            half_window_size = int16(window_size/2);
+            %-------------------------------------------------------
             % Filter the data
             % loop through the columns in the single dataset
             clearvars zc_dataset
@@ -86,22 +117,22 @@ function processed_data = extract_reduce_features(raw_data)
                 % loop through the column
                 for r = 1 : interval :length(colm)   % change 5 to change interval
                 % for r = 1 :length(colm)
-                    if length(colm) < (window+2)
+                    if length(colm) < (window_size+2)
                         % if the column is smaller than the window size then
                         % take the whole column
                         h = colm;
-                    elseif r > (length(colm)-((window/2)+1))
+                    elseif r > (length(colm)-(half_window_size+1))
                         % if towards the end of the column, window/2 values
                         % before r and all values after it.
-                        h = colm(r-(window/2):end);
-                    elseif r < ((window/2)+1)
+                        h = colm(r-half_window_size:end);
+                    elseif r < (half_window_size+1)
                         % if towards the start of the column, take all values
                         % before r and window/2 values after r
-                        h = colm(1:r+(window/2));
+                        h = colm(1:r+half_window_size);
                     else
                         % under normal conditions, take window/2 values before
                         % r and window/2 values after it
-                        h = colm(r-(window/2):r+(window/2));
+                        h = colm(r-half_window_size:r+half_window_size);
                     end
                     % loop through h and see if a ZC exists
                     for rr = 1 : length(h)-1
@@ -126,6 +157,7 @@ function processed_data = extract_reduce_features(raw_data)
         end
     end
 
+
     % ----------------------------------------------
     % Loop through all of the raw_data, extract maximum slope change.
     fprintf("\nManually extracting Maximum slope change...\n")
@@ -139,6 +171,21 @@ function processed_data = extract_reduce_features(raw_data)
             current_dataset = raw_data(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
+            % -------------------------------------------------------
+            % We should not assume that the timestep between samples is fixed.
+            % Therefore, we find the average timestep for every dataset and
+            % change the window size accordingly.
+
+            % find the average timestep between rows
+            avg_timestep = mean(diff(current_timestamp));
+            % in case the timestep is in seconds rather than milliseconds
+            if avg_timestep < 1
+                avg_timestep = avg_timestep*1000;
+            end
+            % `window_size` defines the number of readings in each window
+            window_size = int16(window_duration/avg_timestep);
+            half_window_size = int16(window_size/2);
+            %-------------------------------------------------------
             % Filter the data
             % loop through the columns in the single dataset
             clearvars ms_dataset
@@ -151,26 +198,26 @@ function processed_data = extract_reduce_features(raw_data)
                 % loop through the column
                 for r = 1 : interval :length(colm)   % change 5 to change interval
                 % for r = 1 :length(colm)
-                    if length(colm) < (window+2)
+                    if length(colm) < (window_size+2)
                         % if the column is smaller than the window size then
                         % take the whole column
                         h = colm;
                         timeColum = current_timestamp;
-                    elseif r > (length(colm)-((window/2)+1))
+                    elseif r > (length(colm)-(half_window_size+1))
                         % if towards the end of the column, window/2 values
                         % before r and all values after it.
-                        h = colm(r-(window/2):end);
-                        timeColum = current_timestamp(r-(window/2):end);
-                    elseif r < ((window/2)+1)
+                        h = colm(r-half_window_size:end);
+                        timeColum = current_timestamp(r-half_window_size:end);
+                    elseif r < (half_window_size+1)
                         % if towards the start of the column, take all values
                         % before r and window/2 values after r
-                        h = colm(1:r+(window/2));
-                        timeColum = current_timestamp(1:r+(window/2));
+                        h = colm(1:r+half_window_size);
+                        timeColum = current_timestamp(1:r+half_window_size);
                     else
                         % under normal conditions, take window/2 values before
                         % r and window/2 values after it
-                        h = colm(r-(window/2):r+(window/2));
-                        timeColum = current_timestamp(r-(window/2):r+(window/2));
+                        h = colm(r-half_window_size:r+half_window_size);
+                        timeColum = current_timestamp(r-half_window_size:r+half_window_size);
                     end
                     % gradient() finds the slope change between consequetive
                     % data points. 
