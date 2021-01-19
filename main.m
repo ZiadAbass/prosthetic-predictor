@@ -24,11 +24,11 @@ fprintf("\n--------\n Labelling the data...\n--------\n")
 [final_inputs_svm, final_targets_svm] = label_data_svm(array_per_activity_nomagnet);
 
 fprintf("\n--------\n Training the ANN using all the features...\n--------\n")
-nn_manual(final_labelled_data, 201, 50)
+all_features_nn_accuracy = cross_validate_nn(final_labelled_data, 5, 201);
 close all
 
 fprintf("\n--------\n Training the SVM using all the features...\n--------\n")
-svm_posterior(final_labelled_data, final_targets_svm)
+% svm_posterior(final_labelled_data, final_targets_svm)
 
 
 % ======================================
@@ -42,35 +42,25 @@ fprintf("\n--------\n Finding the top 15 features...\n--------\n")
 fifteen_features_labelled_data = find_15_features(final_labelled_data, final_inputs_svm, final_targets_svm);
 
 fprintf("\n--------\n Training the ANN using 15 features...\n--------\n")
-nn_manual(fifteen_features_labelled_data, 13)
+fifteen_features_nn_accuracy = cross_validate_nn(fifteen_features_labelled_data, 5, 10);
 
 fprintf("\n--------\n Training the SVM using 15 features...\n--------\n")
-% svm_posterior(fifteen_features_labelled_data, final_targets_svm)
+svm_posterior(fifteen_features_labelled_data, final_targets_svm)
 
 % ======================================
 % ================ TASK 3 ==============
 % ======================================
 
 fprintf("\n--------\n Finding features from a single segment...\n--------\n")
-[segment_features_labelled_data] = extract_segment("foor_r", final_labelled_data);
+[segment_features_labelled_data] = extract_segment("foot_r", final_labelled_data);
 
 % ======================================
 % ================ TASK 4 ==============
 % ======================================
 
 fprintf("\n--------\n Training the ANN using features from a single segment...\n--------\n")
-nn_manual(segment_features_labelled_data, 33, 15)
+single_segment_nn_accuracy = cross_validate_nn(segment_features_labelled_data, 5, 33);
 
 fprintf("\n--------\n Training the SVM using features from a single segment...\n--------\n")
-% svm_posterior(segment_features_labelled_data, final_targets_svm)
-
-
-%{
-TODO:
-- Compare the networks with all features vs with only 15 features vs with a
-single segment?
-%}
-
-
-
+svm_posterior(segment_features_labelled_data, final_targets_svm)
 

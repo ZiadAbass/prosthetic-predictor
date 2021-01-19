@@ -1,17 +1,13 @@
 %{
-This function builds a patternet ANN model using given training data. 
-It then tests it using the given test data and produces a confusion matrix
-with the results.
-The patternet created has a single hidden layer, and the number of neurons
-in it is given by the `hiddenLayerSize` param.
-TODO: Mention which
-    - training algo
-    - HL training func
-    - OL training func
+This file is the same as nn_manual.m except for that the test data is
+extracted using the built-in `net.divideParam.testRatio` tool.
 %}
 
 
-function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize)
+function []=nn(inputLabelledData)
+
+    % Define number of neurons for the hidden layer of the NN
+    hiddenLayerSize = 10;
 
     % Create a Pattern Recognition Network with the defined number of hidden layers.
     % `patternnet` is specific for pattern-recognition NNs
@@ -29,30 +25,46 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
     %}
 
     % Set up Division of Data for Training, Validation, Testing Subsets
-    net.divideParam.trainRatio = 60/100;
-    net.divideParam.valRatio = 40/100;
+    net.divideParam.trainRatio = 70/100;
+    net.divideParam.valRatio = 15/100;
+    net.divideParam.testRatio = 15/100;
     
+    % ----------------------------------------------
+    % Split data into inputs and targets for ML
+    % ----------------------------------------------
+    % Define which features to include in the input set.
+    ann_inputs = inputLabelledData(:,1:end-5)';    % Take all the rows, and all the 294 features as inputs. 
+
+    % Define the target set
+    ann_targets = inputLabelledData(:, end-4:end)'; % Take all the rows, and the last 5 columns as outputs. 
+  
     % Standardise and normalise the input data.
     % normalize() normalises the data such that the center is 0 and the 
     % standard deviation is 1. Function normalises each column by default.
     % 'range' makes all the values be between 0 and 1.
-    train_inputs = normalize(train_inputs, 'range');
-    test_inputs = normalize(test_inputs, 'range');
+    ann_inputs = normalize(ann_inputs, 'range');
 
     % Train the Network
-    [net, tr] = train(net, train_inputs, train_targets);
-
+    [net, tr] = train(net, ann_inputs, ann_targets);
+    
     % -----------------------
     % Test the Network with the test subset from the current dataset
     % -----------------------
-    actualTstOutputs = net(test_inputs);
+    %  get the indices/positions randomly selected for the test dataset (15%)
+    tInd = tr.testInd;
+
+    %  obtain the NN's predictions of the test data
+    tstInputs = ann_inputs(:,tInd);
+    tstOutputs = net(tstInputs);
 
     %  compare the NN's predictions against the training set
-    idealTstOutputs = test_targets;
-    tstPerform = perform(net, idealTstOutputs, actualTstOutputs);
+    actualTstOutputs = ann_targets(:,tInd);
+    tstPerform = perform(net, actualTstOutputs, tstOutputs);
 
+    idealTstOutputs = ann_targets(:,tInd);
+    actualTstOutputs = tstOutputs;
+   
     sets_for_labels = [{'LGW'} {'RA'} {'RD'} {'SiS'} {'StS'}];
-
     % we need to convert the targets from Nx5 boolean values into a single 
     % string row/column to be able to run confusionchart
     for yy=1 : size(idealTstOutputs,2)
@@ -68,12 +80,12 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
     end
     % create the confusion matrix object to show and retrieve
     % classification accuracy from
-    plotTitle = sprintf('ANN Confusion Matrix for %i features',size(train_inputs,1));
+    plotTitle = sprintf('ANN Confusion Matrix for %i features',size(inputLabelledData,2)-5);
     cm = confusionchart(idealTstOutputsSimplified,actualTstOutputsSimplified,...
         'Title', plotTitle,...
         'RowSummary', 'absolute',...
         'ColumnSummary', 'absolute');
-    
+
     % Calculate the classification accuracy from the confusion matrix
     % Need to first obtain the number of correct classifications, this will
     % be equal to the sum of the values in the diagonal of the CM
@@ -82,13 +94,11 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
     for ii=1 : length(confusionMatrixResults)
         correct_predictions = correct_predictions + confusionMatrixResults(ii,ii);
     end
-    accuracy = (correct_predictions/length(test_targets))*100;
+    accuracy = (correct_predictions/length(idealTstOutputs))*100;
 
-    fprintf("\n-------------\nSummary:\n    Hidden layer neurons: %i\n", hiddenLayerSize)
-    fprintf("    Number of features: %i \n", size(train_inputs,1))
-    fprintf("    ANN classification accuracy %f\n", accuracy)
-    fprintf('    Patternnet performance: %f \n', tstPerform);
-    fprintf('    num_epochs: %d, stop: %s\n-------------\n\n', tr.num_epochs, tr.stop);
+    fprintf("\n-------------\nANN model accuracy using %i features: %f\n", size(inputLabelledData,2)-5, accuracy)
+    fprintf('Patternnet performance using %i features: %f\n', size(inputLabelledData,2)-5, tstPerform);
+    fprintf('num_epochs: %d, stop: %s\n-------------\n', tr.num_epochs, tr.stop);
 
 end
 

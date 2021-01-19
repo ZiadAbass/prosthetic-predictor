@@ -1,11 +1,14 @@
+%{
+cross_validate_nn() takes in the processed data and performs K-Fold Cross
+Validation by randomising the samples then taking sequential folds from the
+data. It retrieves the classification accuracy from each fold and finds the
+mean accuracy accross all the folds.
+%}
 
-
-function [final_accuracy] = test_bench(labelledData, folds, hiddenLayerSize)
-    % define the number of folds
-%     folds = 5;
+function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize)
+    % define the number test samples in each fold
     test_element_count = int32(size(labelledData,1)/folds);
-    % number of neurons in hidden layer
-%     hidden_layer_neurons = 10;
+
     % initialisations
     foldCounter = 1;
     total_accuracy = 0;
@@ -34,7 +37,7 @@ function [final_accuracy] = test_bench(labelledData, folds, hiddenLayerSize)
             test_targets = test_extracted(:, end-4:end)'; 
 
             % train the ANN with the extracted data
-            acc = new_nn_manual(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize);
+            acc = nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize);
             fprintf("\n    Accuracy for this fold is %f\n\n", acc)
 
             foldCounter = foldCounter+1;
