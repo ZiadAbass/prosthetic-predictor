@@ -112,37 +112,5 @@ function []=svm_posterior(labelledData, svmTargets)
     one produced when the SVM was evaluated normally. 
     This way of evaluating the SVM model is more robust.
     %}
-
-    %{ 
-    TODO (Optional): Fix this section to visaulise max class posterior probability, 
-    see end of openExample('stats/EstimatePosteriorProbabilitiesUsingECOCClassifiersExample')
-    for an example
-
-    %{
-    For each coordinate on the grid, plot the maximum class posterior probability among all classes.
-    %}
-    maxi = max(TestSamplePosteriorRegion,[],2);
-    size1 = size(test_inputs,1);
-    size2 = size(test_inputs,2);
-    hamada = reshape(maxi,size2,size1);
-    contourf(test_inputs(:,1),test_inputs(:,2),maxi);
-
-    h = colorbar;
-    h.YLabel.String = 'Maximum posterior';
-    h.YLabel.FontSize = 15;
-
-    hold on
-    gh = gscatter(X(:,1),X(:,2),Y,'krk','*xd',8);
-    gh(2).LineWidth = 2;
-    gh(3).LineWidth = 2;
-
-    title('Iris Petal Measurements and Maximum Posterior')
-    xlabel('Petal length (cm)')
-    ylabel('Petal width (cm)')
-    axis tight
-    legend(gh,'Location','NorthWest')
-    hold off
-    %}
-
 end
 

@@ -5,12 +5,10 @@ It also takes in the required time interval which will be used to determine
 which rows/values to take.
 It calculates the timestep between each row using the timestamp column and
 deletes the rows that are not needed from the extracted features table.
+Also takes in timeInterval which defines the time interval required in ms (delta t).
 %}
 
-function [reduced_data, interval]=reduce_data(timestampColumn,dataTable)
-
-    % define the time interval required in ms
-    time_interval = 50;
+function [reduced_data, interval]=reduce_data(timestampColumn,dataTable, timeInterval)
 
     % the max and min time increment steps allowed between consequetive
     % readings. If a step beyond the allowed limits is found an error is
@@ -30,10 +28,10 @@ function [reduced_data, interval]=reduce_data(timestampColumn,dataTable)
     % take from the extracted data
     if (avg_timestep > minStepAllowed_ms) && (avg_timestep < maxStepAllowed_ms)
 %         fprintf("\ntimestep is in milliseconds: %f\n", avg_timestep)
-        interval = int16(time_interval/avg_timestep);
+        interval = int16(timeInterval/avg_timestep);
     elseif (avg_timestep > minStepAllowed_ms/1000) && (avg_timestep < maxStepAllowed_ms/1000)
 %         fprintf("\ntimestep is in seconds: %f\n", avg_timestep)
-        interval = int16((time_interval/1000)/avg_timestep);
+        interval = int16((timeInterval/1000)/avg_timestep);
     else
         fprintf("\nError - cannot determine the timestep unit: %f\n", avg_timestep)
     end

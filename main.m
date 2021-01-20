@@ -11,10 +11,10 @@ fprintf("\n--------\n Importing the data...\n--------\n")
 raw_data = new_import_datasets();
 
 fprintf("\n--------\n Filtering the data...\n--------\n")
-raw_data = filter_data(raw_data);
+filtered_raw_data = filter_data(raw_data);
 
 fprintf("\n--------\n Extracting the time-domain features...\n--------\n")
-processed_data = extract_reduce_features(raw_data);
+processed_data = extract_reduce_features(filtered_raw_data);
 
 fprintf("\n--------\n Organising the features...\n--------\n")
 array_per_activity_nomagnet = organise_features(processed_data);

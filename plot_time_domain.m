@@ -21,7 +21,7 @@ function [] = plot_time_domain(keyword, labelledData)
     figure;
     for ii=1 : 7
         subplot(2,4,ii)
-        stem(segment_features_labelled_data(1:150,ii), 'b')
+        stem(segment_features_labelled_data(500:650,ii), 'b')
         title(relevant_features(ii))
     end
 end

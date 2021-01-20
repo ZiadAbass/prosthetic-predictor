@@ -15,11 +15,11 @@ This script outputs the 'processed_data' struct. The data is reduced using the g
 
 %}
 
-function processed_data = extract_reduce_features(raw_data)
+function processed_data = extract_reduce_features(filtered_raw_data)
     close all;  % close all popup windows
 
     % ----------------------------------------------
-    % Loop through all of the raw_data, extract max, min, mean, standard
+    % Loop through all of the filtered_raw_data, extract max, min, mean, standard
     % deviation and RMS.
     fprintf("\nExtracting time domain features...\n")
     % ----------------------------------------------
@@ -31,10 +31,12 @@ function processed_data = extract_reduce_features(raw_data)
     features = ["MAX", "MIN", "AVG", "SD","RMS"];
     % size of the sliding window for extracting features in milliseconds
     window_duration = 400;
+    % define the time interval required in ms
+    timeInterval = 50;
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(raw_data)
-            current_dataset = table2array(raw_data(kk).(sets{ff}));
+        for kk = 1 : length(filtered_raw_data)
+            current_dataset = table2array(filtered_raw_data(kk).(sets{ff}));
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = current_dataset(:,1);
 
@@ -66,7 +68,7 @@ function processed_data = extract_reduce_features(raw_data)
                 % reduce the data using the required time interval. 
                 % We want to extract only every Nth row to match our time
                 % interval. The 'interval' var defines N.
-                [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w});
+                [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w}, timeInterval);
                 temp_processed_data(1).(features{w}) = reduced_data; 
             end
             processed_data(kk).(sets{ff}) = temp_processed_data;
@@ -75,16 +77,16 @@ function processed_data = extract_reduce_features(raw_data)
 
 
     % ----------------------------------------------
-    % Loop through all of the raw_data, extract Zero Crossing.
+    % Loop through all of the filtered_raw_data, extract Zero Crossing.
     fprintf("\nManually extracting Zero Crossing...\n")
     % ----------------------------------------------
     % extract zero crossing for the data and add to the same processed_data
     % struct
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(raw_data)
+        for kk = 1 : length(filtered_raw_data)
             % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
-            current_dataset = raw_data(kk).(sets{ff});
+            current_dataset = filtered_raw_data(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
             % -------------------------------------------------------
@@ -157,16 +159,16 @@ function processed_data = extract_reduce_features(raw_data)
 
 
     % ----------------------------------------------
-    % Loop through all of the raw_data, extract maximum slope change.
+    % Loop through all of the filtered_raw_data, extract maximum slope change.
     fprintf("\nManually extracting Maximum slope change...\n")
     % ----------------------------------------------
     % extract maximum slope for the data and add to the same processed_data
     % struct
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(raw_data)
+        for kk = 1 : length(filtered_raw_data)
     %         fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
-            current_dataset = raw_data(kk).(sets{ff});
+            current_dataset = filtered_raw_data(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
             % -------------------------------------------------------
