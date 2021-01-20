@@ -10,8 +10,6 @@ It organises the data:
     training samples of all features + parts of body
 3. We delete the columns containing magnetometer data as they are not
 relevant to the purpose of the classifiers we are building
-3. Finally, we label those 
-    (eg if one-hot-encoding will need a complementary matrix with labels)
 %}
 
 function array_per_activity_nomagnet = organise_features(processed_data)
@@ -110,7 +108,7 @@ function array_per_activity_nomagnet = organise_features(processed_data)
         (2/3) getting rid of magnetometer readings (deleting 3 in every 9 columns)
         so 63 x 7 x (2/3) = 294
 
-    The N varies with each dataset depending on the original number of rows in
+    The N varies with each dataset depending on the original number of rows (samples) in
     the raw data.
     %}
 

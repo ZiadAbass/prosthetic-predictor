@@ -31,11 +31,9 @@ function processed_data = extract_reduce_features(raw_data)
     features = ["MAX", "MIN", "AVG", "SD","RMS"];
     % size of the sliding window for extracting features in milliseconds
     window_duration = 400;
-    Y = 0;
     % loop through each of the folders
     for ff = 1 : length(sets)
         for kk = 1 : length(raw_data)
-    %         fprintf("\nkk is %i, ff is %i\n", kk, ff)
             current_dataset = table2array(raw_data(kk).(sets{ff}));
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = current_dataset(:,1);

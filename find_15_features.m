@@ -6,7 +6,7 @@ It extracts these 15 features and plots a labelled bar graph of their scores.
 
 %}
 
-function [fifteen_features_labelled_data]=find_15_features(labelledData, svm_inputs, svm_targets)
+function [fifteen_features_labelled_data,Y]=find_15_features(labelledData, svm_inputs, svm_targets)
 
     % labels.csv contains all the class labels in english in the same order 
     % that they appear in the data

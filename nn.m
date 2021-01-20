@@ -4,18 +4,15 @@ It then tests it using the given test data and produces a confusion matrix
 with the results.
 The patternet created has a single hidden layer, and the number of neurons
 in it is given by the `hiddenLayerSize` param.
-TODO: Mention which
-    - training algo
-    - HL training func
-    - OL training func
 %}
 
 
-function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize)
+function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize, trainingAlgo)
 
     % Create a Pattern Recognition Network with the defined number of hidden layers.
     % `patternnet` is specific for pattern-recognition NNs
-    net = patternnet(hiddenLayerSize);
+    net = patternnet(hiddenLayerSize, trainingAlgo);
+    net.trainParam.showWindow = 0;   % hide the training window
     %{
     patternnet() is specialized for pattern recognition problems. 
     - Default training algo: Scaled conjugate gradient backpropagation (trainscg). 
@@ -29,13 +26,13 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
     %}
 
     % Set up Division of Data for Training, Validation, Testing Subsets
-    net.divideParam.trainRatio = 60/100;
-    net.divideParam.valRatio = 40/100;
+    net.divideParam.trainRatio = 85/100;
+    net.divideParam.valRatio = 15/100;
     
     % Standardise and normalise the input data.
-    % normalize() normalises the data such that the center is 0 and the 
+    % standardisation shifts the data such that the center is 0 and the 
     % standard deviation is 1. Function normalises each column by default.
-    % 'range' makes all the values be between 0 and 1.
+    % 'range' makes all the values be between 0 and 1 (normalisation)
     train_inputs = normalize(train_inputs, 'range');
     test_inputs = normalize(test_inputs, 'range');
 

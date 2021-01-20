@@ -5,7 +5,7 @@ data. It retrieves the classification accuracy from each fold and finds the
 mean accuracy accross all the folds.
 %}
 
-function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize)
+function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize, trainingAlgo)
     % define the number test samples in each fold
     test_element_count = int32(size(labelledData,1)/folds);
 
@@ -22,7 +22,6 @@ function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSi
             fprintf("\n*******************\nRunning fold %i out of %i\n",foldCounter, folds)
             % extract the test set 
             test_extracted = random_final_labelled_data((ii+1:ii+test_element_count-1),:);
-            % train_extracted = final_labelled_data((ii+1:ii+test_element_count),:);
             % extract the test set (the remaining data), which also includes
             % validation data
             train_extracted = random_final_labelled_data;
@@ -37,7 +36,7 @@ function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSi
             test_targets = test_extracted(:, end-4:end)'; 
 
             % train the ANN with the extracted data
-            acc = nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize);
+            acc = nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize, trainingAlgo);
             fprintf("\n    Accuracy for this fold is %f\n\n", acc)
 
             foldCounter = foldCounter+1;

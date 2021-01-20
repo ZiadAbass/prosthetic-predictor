@@ -1,5 +1,5 @@
 %{
-This script builds a multiclass svm model and evaluates it using 
+This function builds a multiclass svm model and evaluates it using 
 Posterior Probabilities
 %}
 
