@@ -15,7 +15,6 @@ function [raw_data] = new_import_datasets()
     % array containing the names of the folders. These names will match the
     % field names in the struct
     folders = ["LGW","RA","RD","SiS","StS"];
-
     % loop through each of the folders
     for ff = 1 : length(folders)
         % specify the folder we are interested in during this loop

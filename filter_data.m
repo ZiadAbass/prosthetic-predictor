@@ -13,7 +13,7 @@ function raw_data = filter_data(raw_data)
 
     % extract time column (x) and one feature (y)
     current_dataset = raw_data(3).RA;
-    x = table2array(current_dataset(1:end,1));
+%     x = table2array(current_dataset(1:end,1));
 
     % ----------------------------------------------
     % Loop through all of the raw_data and apply the filter on each column
@@ -24,7 +24,7 @@ function raw_data = filter_data(raw_data)
     % loop through each of the folders
     for ff = 1 : length(sets)
         for kk = 1 : length(raw_data)
-    %         fprintf("\nkk is %i, ff is %i\n", kk, ff)
+            % sequentially extract a single dataset
             current_dataset = raw_data(kk).(sets{ff});
             % Filter the data
             % loop through the columns in the single dataset
