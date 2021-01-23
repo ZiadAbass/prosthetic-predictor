@@ -12,7 +12,7 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
     % Create a Pattern Recognition Network with the defined number of hidden layers.
     % `patternnet` is specific for pattern-recognition NNs
     net = patternnet(hiddenLayerSize, trainingAlgo);
-    net.trainParam.showWindow = 0;   % hide the training window
+%     net.trainParam.showWindow = 0;   % hide the training window
     %{
     patternnet() is specialized for pattern recognition problems. 
     - Default training algo: Scaled conjugate gradient backpropagation (trainscg). 
@@ -25,9 +25,10 @@ function [accuracy]=nn(train_inputs, test_inputs, train_targets, test_targets, h
         * Therefore, small values -> good performance, large values -> bad performance.
     %}
 
-    % Set up Division of Data for Training, Validation, Testing Subsets
-    net.divideParam.trainRatio = 85/100;
-    net.divideParam.valRatio = 15/100;
+    % Set up Division of Data for Training and Validation.
+    % The test subset has already been extracted.
+    net.divideParam.trainRatio = 50/100;
+    net.divideParam.valRatio = 50/100;
     
     % Standardise and normalise the input data.
     % standardisation shifts the data such that the center is 0 and the 

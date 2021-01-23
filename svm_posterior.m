@@ -3,7 +3,7 @@ This function builds a multiclass svm model and evaluates it using
 Posterior Probabilities
 %}
 
-function []=svm_posterior(labelledData, svmTargets)
+function [accuracy]=svm_posterior(labelledData, svmTargets, kernelFunction, boxConstraint)
     
     % ######### Set aside some of the data for testing ##########
     
@@ -24,9 +24,10 @@ function []=svm_posterior(labelledData, svmTargets)
     random_final_inputs = normalize(random_final_inputs, 'range');
 
     % set some percentage of it aside for testing
-    test_percent = 15;
+    test_percent = 30;
     test_element_count = uint32((test_percent/100)*length(random_final_inputs));
 
+    
     % Define which features to include in the input set.
     train_inputs = random_final_inputs(1:end-test_element_count,:);    % Take all the rows, and all the 10 features as inputs. Could also use: inputs = dataSet(:,1:end-2).
     test_inputs= random_final_inputs(end-test_element_count+1:end,:);
@@ -38,8 +39,13 @@ function []=svm_posterior(labelledData, svmTargets)
 
     % ######### Model Training ##################################
 
-    %Create a SVM Model template to fit into fitcecoc()
-    t = templateSVM('Standardize',true,'KernelFunction','gaussian');
+    % Create a SVM Model template to fit into fitcecoc()
+    if kernelFunction == "polynomial"
+        % if it's a polynomial kernel function then set the order to 2 (i.e. quadratic)
+        t = templateSVM('Standardize',true,'KernelFunction',kernelFunction, 'BoxConstraint', boxConstraint, 'PolynomialOrder', 2);
+    else
+        t = templateSVM('Standardize',true,'KernelFunction',kernelFunction, 'BoxConstraint', boxConstraint);
+    end
 
     %{
     Train the ECOC classifier using the SVM template. 

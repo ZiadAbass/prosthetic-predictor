@@ -28,7 +28,7 @@ all_features_nn_accuracy = cross_validate_nn(final_labelled_data, 5, 201, "train
 close all
 
 fprintf("\n--------\n Training the SVM using all the features...\n--------\n")
-% svm_posterior(final_labelled_data, final_targets_svm)
+all_features_svm_accuracy = svm_posterior(final_labelled_data, final_targets_svm, "gaussian", 1);
 
 
 % ======================================
@@ -45,7 +45,7 @@ fprintf("\n--------\n Training the ANN using 15 features...\n--------\n")
 fifteen_features_nn_accuracy = cross_validate_nn(fifteen_features_labelled_data, 5, 10, "trainscg");
 
 fprintf("\n--------\n Training the SVM using 15 features...\n--------\n")
-svm_posterior(fifteen_features_labelled_data, final_targets_svm)
+fifteen_features_svm_accuracy = svm_posterior(fifteen_features_labelled_data, final_targets_svm, "gaussian", 1);
 
 % ======================================
 % ================ TASK 3 ==============
@@ -59,8 +59,8 @@ fprintf("\n--------\n Finding features from a single segment...\n--------\n")
 % ======================================
 
 fprintf("\n--------\n Training the ANN using features from a single segment...\n--------\n")
-single_segment_nn_accuracy = cross_validate_nn(segment_features_labelled_data, 5, 33, "trainscg");
+single_segment_nn_accuracy = cross_validate_nn(segment_features_labelled_data, 5, 35, "trainscg");
 
 fprintf("\n--------\n Training the SVM using features from a single segment...\n--------\n")
-svm_posterior(segment_features_labelled_data, final_targets_svm)
+single_segment_svm_accuracy = svm_posterior(segment_features_labelled_data, final_targets_svm, "gaussian", 1);
 

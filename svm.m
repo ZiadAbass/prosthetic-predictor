@@ -3,7 +3,6 @@ Support vector machine
 %}
 
 clc
-load('svm_data.mat')
 
 % ######### Set aside some of the data for testing ##########
 
@@ -14,7 +13,7 @@ random_final_inputs = final_inputs_svm(p, :);
 random_final_targets = final_targets_svm(p, :);
 
 % set some percentage of it aside for testing
-test_percent = 15;
+test_percent = 85;
 test_element_count = uint32((test_percent/100)*length(random_final_inputs));
 
 % Define which features to include in the input set.
