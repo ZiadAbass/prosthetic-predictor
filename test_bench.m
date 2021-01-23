@@ -56,7 +56,6 @@ for ff = 1 : length(sets)
     end
 end
 
-
 % ----------------------------------------------
 % Loop through all of the filtered_raw_data, extract Zero Crossing.
 fprintf("\nManually extracting Zero Crossing...\n")
@@ -107,11 +106,12 @@ for ff = 1 : length(sets)
             for r = 1 : interval :length(colm)
                 if length(colm) < (window_size+2)
                     % if the column is smaller than the window size then ignore
+                    fprintf("\nHasal?\n")
                     continue
-                elseif r > (length(colm)-(half_window_size+1))
+                elseif r > (length(colm)-(half_window_size))
                     % if towards the end of the column, ignore the window
                     continue
-                elseif r < (half_window_size+2)
+                elseif r < (half_window_size+1)
                     % if towards the start of the column, ignore the window
                     continue
                 else
@@ -135,7 +135,7 @@ for ff = 1 : length(sets)
                 % if we had found a ZC then we want to assign 1, if not
                 % then 0. Indexing (((r-1)/5)+1) instead of r as r is
                 % increasing by increments of 5.
-                sequentialIndex = ((r-1)/interval)-4;
+                sequentialIndex = ((r-1)/interval)-3;
                 if zc
                     zc_column(sequentialIndex) = 1;   % if r going in 5s
                 else
@@ -152,9 +152,10 @@ for ff = 1 : length(sets)
 end
 
 
+
 % ----------------------------------------------
 % Loop through all of the filtered_raw_data, extract Zero Crossing.
-fprintf("\nManually extracting Zero Crossing...\n")
+fprintf("\nManually extracting MMM Crossing...\n")
 % ----------------------------------------------
 % extract zero crossing for the data and add to the same processed_data
 % struct
@@ -202,11 +203,12 @@ for ff = 1 : length(sets)
             for r = 1 : interval :length(colm)
                 if length(colm) < (window_size+2)
                     % if the column is smaller than the window size then ignore
+                    fprintf("\nHasal?\n")
                     continue
-                elseif r > (length(colm)-(half_window_size+1))
+                elseif r > (length(colm)-(half_window_size))
                     % if towards the end of the column, ignore the window
                     continue
-                elseif r < (half_window_size+2)
+                elseif r < (half_window_size+1)
                     % if towards the start of the column, ignore the window
                     continue
                 else
@@ -221,8 +223,7 @@ for ff = 1 : length(sets)
                         h = colm(r-half_window_size:r+half_window_size);
                     end
                 end
-               
-                sequentialIndex = ((r-1)/interval)-4;
+                sequentialIndex = ((r-1)/interval)-3;
                 ms_column(sequentialIndex) = mean(h);
             end
             % append the zc_column to the existing zc table
@@ -234,7 +235,7 @@ end
 
 
 
-
+clearvars -except filtered_raw_data processed_data
 
 %{
 % rng(1);
