@@ -16,7 +16,7 @@ Returns
                             the models across the N folds.
 %}
 
-function [meanAccuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize, trainingAlgo)
+function [meanAccuracy] = crossValidateNN(labelledData, folds, hiddenLayerSize, trainingAlgo)
     % define the number test samples in each fold
     test_element_count = int32(size(labelledData,1)/folds);
 

@@ -10,7 +10,7 @@ Returns:
 - `segmentFeaturesLabelled`  -> dataset after reducing it to only data from that segment.
 %}
 
-function [segmentFeaturesLabelled, sig_indexes]=extract_segment(keyword, labelledData)
+function [segmentFeaturesLabelled, sig_indexes]=extractSegment(keyword, labelledData)
     % labels.csv contains all the class labels in english in the same order 
     % that they appear in the data
     feature_labels = readtable("labels.csv", "ReadVariableNames",true, 'Delimiter','comma');

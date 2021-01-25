@@ -4,7 +4,7 @@ It extracts a column/feature in a given dataset and returns the required
 data to visualise the effect of a low pass filter on it.
 %}
 
-function [x, Y, filtered_Y] = visualise_filter_data(raw_data, cutoffFreq, sampleRate, activityIndex, datasetIndex)
+function [x, Y, filtered_Y] = visualiseFilterData(raw_data, cutoffFreq, sampleRate, activityIndex, datasetIndex)
     % create a low pass filter with the given params
     d = designfilt('lowpassfir', 'FilterOrder', 8, 'CutoffFrequency', cutoffFreq, 'SampleRate', sampleRate);
 

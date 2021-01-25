@@ -15,7 +15,7 @@ Returns:
 `labelledData` that has samples from only the top 15 features.
 %}
 
-function [fifteenFeaturesLabelledData]=find_15_features(labelledData, unlabelledInputs, classLabels)
+function [fifteenFeaturesLabelledData]=find15Features(labelledData, unlabelledInputs, classLabels)
 
     % labels.csv contains all the class labels in english in the same order 
     % that they appear in the data

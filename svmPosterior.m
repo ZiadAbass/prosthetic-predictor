@@ -15,7 +15,7 @@ Returns
 SVM model is tested with the unseen test set
 %}
 
-function [accuracy]=svm_posterior(labelledData, svmTargets, kernelFunction, boxConstraint)
+function [accuracy]=svmPosterior(labelledData, svmTargets, kernelFunction, boxConstraint)
     
     % ######### Set aside some of the data for testing ##########
     

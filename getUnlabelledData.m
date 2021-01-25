@@ -1,7 +1,8 @@
 %{
 This function takes in the arrayPerActivity struct containing a
 single table for each activity.
-It labels this data by assigning a unique label to each class.
+It labels this data by assigning a unique label to each class, which will
+eventually be the targets for SVMs.
 
 Arguments
 - `arrayPerActivity` -> struct containing a single array per
@@ -12,7 +13,7 @@ Returns
 - `classLabels`         -> [Nx1] class labels with a unique string for each class
 %}
 
-function [unlabelledInputs, classLabels] = label_data_svm(arrayPerActivity)
+function [unlabelledInputs, classLabels] = getUnlabelledData(arrayPerActivity)
     % array containing the names of the activities. 
     % These names will match the field names in the struct
     sets = ["LGW","RA","RD","SiS","StS"];

@@ -6,7 +6,7 @@ Returns
 - `rawData`    -> a 1x12 struct with 5 fields ("LGW","RA","RD","SiS" and "StS")
 %}
 
-function [rawData] = new_import_datasets()
+function [rawData] = importDatasets()
     % initialisations
     previous_is_timestamp = false;
     columnsToDelete = ("yes");

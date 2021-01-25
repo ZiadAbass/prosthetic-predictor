@@ -4,11 +4,16 @@ extracted, this function extracts all the time domain features
 from a certain axis of a certain body segment (e.g. thigh_l_gyro_x)
 and plots the first 150 readings of the 7 extracted features corresponding
 to it.
+
+Arguments
+- `keyword`         -> name of a section to plot the time domain features
+                        (e.g. "foot_l_gyro_x")
+- `labelledData`    -> the labelled data
 %}
 
-function [] = plot_time_domain(keyword, labelledData)
+function [] = plotTimeDomain(keyword, labelledData)
     % extract the relevant data from the dataset
-    [segment_features_labelled_data, sig_indexes] = extract_segment(keyword, labelledData);
+    [segment_features_labelled_data, sig_indexes] = extractSegment(keyword, labelledData);
 
     % sig_indexes contains the column indexes of the relevant features in order
     % labels.csv contains all the class labels in english in the same order 
@@ -21,9 +26,7 @@ function [] = plot_time_domain(keyword, labelledData)
     figure;
     for ii=1 : 7
         subplot(2,4,ii)
-        jj = segment_features_labelled_data(500:650,ii);
-        kk = flip(jj,1);
-        stem(kk, 'b')
+        stem(segment_features_labelled_data(500:650,ii), 'b')
         title(relevant_features(ii))
     end
 end

@@ -14,7 +14,7 @@ Returns:
                         activities labelled by one-hot encoding
 %}
 
-function [labelledData] = label_data_nn(arrayPerActivity)
+function [labelledData] = getLabelledData(arrayPerActivity)
 
     % array containing the names of the activities. 
     % These names will match the field names in the struct

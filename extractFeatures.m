@@ -20,7 +20,7 @@ Returns:
                         according to the given time window and interval
 %}
 
-function processedData = extract_reduce_features(filteredRawData)
+function processedData = extractFeatures(filteredRawData)
     % ----------------------------------------------
     % Loop through all of the filteredRawData, extract max, min, mean, standard
     % deviation and RMS.
@@ -72,7 +72,7 @@ function processedData = extract_reduce_features(filteredRawData)
                 % reduce the data using the required time interval. 
                 % We want to extract only every Nth row to match our time
                 % interval. The 'interval' var defines N.
-                [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w}, timeInterval);
+                [reduced_data, interval] = reduceData(current_timestamp, dataset_features{1,w}, timeInterval);
                 temp_processedData(1).(features{w}) = reduced_data; 
             end
             processedData(kk).(sets{ff}) = temp_processedData;

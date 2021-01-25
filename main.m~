@@ -23,7 +23,6 @@ fprintf("\n--------\n Organising the features...\n--------\n")
 arrayPerActivity = organiseFeatures(processedData);
 
 fprintf("\n--------\n Labelling the data...\n--------\n")
-[unlabelledData, classLabels] = getUnlabelledData(arrayPerActivity);
 [labelledData] = getLabelledData(arrayPerActivity);
 
 % [OPTIONAL] Plot the 7 extracted time domain features of a section

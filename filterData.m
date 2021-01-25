@@ -9,7 +9,7 @@ Returns:
 - `rawData`    -> updated struct containing the filtered data
 %}
 
-function rawData = filter_data(rawData)
+function rawData = filterData(rawData)
     % create a low pass filter
     filter_Fs = 100;            % filter sampling rate
     filter_Fc = 7;              % cutoff frequency in Hz

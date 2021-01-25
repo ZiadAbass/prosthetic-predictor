@@ -13,7 +13,7 @@ given delta t.
 - `interval`            -> the number of readings between each interval
 %}
 
-function [reducedData, interval]=reduce_data(timestampColumn,dataTable, timeInterval)
+function [reducedData, interval]=reduceData(timestampColumn,dataTable, timeInterval)
 
     % the max and min time increment steps allowed between consequetive
     % readings. If a step beyond the allowed limits is found an error is

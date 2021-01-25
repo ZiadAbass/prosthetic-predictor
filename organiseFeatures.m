@@ -18,7 +18,7 @@ Returns:
 activity without any magnetometer data.
 %}
 
-function arrayPerActivity = organise_features(processedData)
+function arrayPerActivity = organiseFeatures(processedData)
 
     % array containing the names of the activities. 
     % These names will match the field names in the struct

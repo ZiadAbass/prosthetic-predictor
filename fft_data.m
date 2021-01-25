@@ -6,12 +6,6 @@ Provides good frequency domain plot that visually justifies the choice for
 the cutoff frequency used in the low pass filter.
 %}
 
-% good practice to start with these
-% clear;      % clear the workspace
-clc;        % clear the command window
-close all;  % close all popup windows
-
-
 % extract time column (x) and one feature (y)
 current_dataset = raw_data(3).RA;
 x = table2array(current_dataset(1:280,1));
