@@ -16,8 +16,6 @@ This script outputs the 'processed_data' struct. The data is reduced using the g
 %}
 
 function processed_data = extract_reduce_features(filtered_raw_data)
-    close all;  % close all popup windows
-
     % ----------------------------------------------
     % Loop through all of the filtered_raw_data, extract max, min, mean, standard
     % deviation and RMS.
@@ -55,12 +53,13 @@ function processed_data = extract_reduce_features(filtered_raw_data)
             window_size = int32(window_duration/avg_timestep);
             %-------------------------------------------------------
 
-            % extract time domain features from each dataset
-            smean = movmean(current_dataset_without_timestamp, window_size);
-            stdD = movstd(current_dataset_without_timestamp, window_size);
-            maxV = movmax(current_dataset_without_timestamp, window_size);
-            min = movmin(current_dataset_without_timestamp, window_size);
-            rms = sqrt(movmean(current_dataset_without_timestamp .^ 2, window_size));
+            % extract time domain features from each dataset, discarding
+            % endpoints to have all windows exactly the length they should be.
+            smean = movmean(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
+            stdD = movstd(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
+            maxV = movmax(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
+            min = movmin(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
+            rms = sqrt(movmean(current_dataset_without_timestamp .^ 2, window_size, 'Endpoints','discard'));
             % group all the features
             dataset_features = {maxV, min, smean, stdD, rms};
             % assign all the features to a single new struct
@@ -74,7 +73,6 @@ function processed_data = extract_reduce_features(filtered_raw_data)
             processed_data(kk).(sets{ff}) = temp_processed_data;
         end
     end
-
 
     % ----------------------------------------------
     % Loop through all of the filtered_raw_data, extract Zero Crossing.
@@ -102,7 +100,15 @@ function processed_data = extract_reduce_features(filtered_raw_data)
             end
             % `window_size` defines the number of readings in each window
             window_size = int16(window_duration/avg_timestep);
-            half_window_size = int16(window_size/2);
+            % define the half window size according to whether the window is
+            % odd or even
+            if rem(window_size,2) == 0
+                % if window size is even
+                half_window_size = int16(window_size/2);
+            else
+                % if window size is odd
+                half_window_size = int16((window_size-1)/2);
+            end
             %-------------------------------------------------------
             % Filter the data
             % loop through the columns in the single dataset
@@ -115,24 +121,26 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                 zc = false;
                 clearvars zc_column
                 % loop through the column
-                for r = 1 : interval :length(colm)   % change 5 to change interval
-                % for r = 1 :length(colm)
+                for r = 1 : interval :length(colm)
                     if length(colm) < (window_size+2)
-                        % if the column is smaller than the window size then
-                        % take the whole column
-                        h = colm;
-                    elseif r > (length(colm)-(half_window_size+1))
-                        % if towards the end of the column, window/2 values
-                        % before r and all values after it.
-                        h = colm(r-half_window_size:end);
+                        % if the column is smaller than the window size then ignore
+                        fprintf("\nHasal?\n")
+                        continue
+                    elseif r > (length(colm)-(half_window_size))
+                        % if towards the end of the column, ignore the window
+                        continue
                     elseif r < (half_window_size+1)
-                        % if towards the start of the column, take all values
-                        % before r and window/2 values after r
-                        h = colm(1:r+half_window_size);
+                        % if towards the start of the column, ignore the window
+                        continue
                     else
-                        % under normal conditions, take window/2 values before
-                        % r and window/2 values after it
-                        h = colm(r-half_window_size:r+half_window_size);
+                        if rem(window_size,2) == 0
+                            % if window size is even
+                            g = (window_size-2)/2;
+                            h = colm(r-(g+1):r+g);
+                        else
+                            % if window size is odd
+                            h = colm(r-half_window_size:r+half_window_size);
+                        end
                     end
                     % loop through h and see if a ZC exists
                     for rr = 1 : length(h)-1
@@ -141,12 +149,13 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                         end
                     end
                     % if we had found a ZC then we want to assign 1, if not
-                    % then 0. Indexing (((r-1)/5)+1) instead of r as r is
-                    % increasing by increments of 5.
+                    % then 0. Indexing `sequentialIndex` instead of r as r is
+                    % increasing by non-1 increments.
+                    sequentialIndex = ((r-1)/interval)-3;
                     if zc
-                        zc_column(((r-1)/interval)+1) = 1;   % if r going in 5s
+                        zc_column(sequentialIndex) = 1;
                     else
-                        zc_column(((r-1)/interval)+1) = 0;   % if r going in 5s
+                        zc_column(sequentialIndex) = 0;
                     end
                     zc = false;
                 end
@@ -158,16 +167,16 @@ function processed_data = extract_reduce_features(filtered_raw_data)
     end
 
 
+
     % ----------------------------------------------
-    % Loop through all of the filtered_raw_data, extract maximum slope change.
-    fprintf("\nManually extracting Maximum slope change...\n")
+    % Loop through all of the filtered_raw_data, extract Maximum Slope Change.
+    fprintf("\nManually extracting MSC...\n")
     % ----------------------------------------------
-    % extract maximum slope for the data and add to the same processed_data
+    % extract zero crossing for the data and add to the same processed_data
     % struct
     % loop through each of the folders
     for ff = 1 : length(sets)
         for kk = 1 : length(filtered_raw_data)
-    %         fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
             current_dataset = filtered_raw_data(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
@@ -184,41 +193,49 @@ function processed_data = extract_reduce_features(filtered_raw_data)
             end
             % `window_size` defines the number of readings in each window
             window_size = int16(window_duration/avg_timestep);
-            half_window_size = int16(window_size/2);
+            % define the half window size according to whether the window is
+            % odd or even
+            if rem(window_size,2) == 0
+                % if window size is even
+                half_window_size = int16(window_size/2);
+            else
+                % if window size is odd
+                half_window_size = int16((window_size-1)/2);
+            end
             %-------------------------------------------------------
             % Filter the data
             % loop through the columns in the single dataset
             clearvars ms_dataset
             for ii = 1 : width(current_dataset_without_timestamp)
-    %             fprintf("\nDone %i of %i columns in this dataset", ii, width(current_dataset_without_timestamp))
                 % obtain the relevant column
                 colm = table2array(current_dataset_without_timestamp(1:end,ii));
-                % calculate max slope change manually
                 clearvars ms_column
                 % loop through the column
-                for r = 1 : interval :length(colm)   % change 5 to change interval
-                % for r = 1 :length(colm)
+                for r = 1 : interval :length(colm)
                     if length(colm) < (window_size+2)
-                        % if the column is smaller than the window size then
-                        % take the whole column
-                        h = colm;
-                        timeColum = current_timestamp;
-                    elseif r > (length(colm)-(half_window_size+1))
-                        % if towards the end of the column, window/2 values
-                        % before r and all values after it.
-                        h = colm(r-half_window_size:end);
-                        timeColum = current_timestamp(r-half_window_size:end);
+                        % if the column is smaller than the window size then ignore
+                        continue
+                    elseif r > (length(colm)-(half_window_size))
+                        % if towards the end of the column, ignore the window
+                        continue
                     elseif r < (half_window_size+1)
-                        % if towards the start of the column, take all values
-                        % before r and window/2 values after r
-                        h = colm(1:r+half_window_size);
-                        timeColum = current_timestamp(1:r+half_window_size);
+                        % if towards the start of the column, ignore the window
+                        continue
                     else
                         % under normal conditions, take window/2 values before
                         % r and window/2 values after it
-                        h = colm(r-half_window_size:r+half_window_size);
-                        timeColum = current_timestamp(r-half_window_size:r+half_window_size);
+                        if rem(window_size,2) == 0
+                            g = (window_size-2)/2;
+                            % if window size is evn
+                            h = colm(r-(g+1):r+g);
+                            timeColum = current_timestamp(r-(g+1):r+g);
+                        else
+                            % if window size is odd
+                            h = colm(r-half_window_size:r+half_window_size);
+                            timeColum = current_timestamp(r-half_window_size:r+half_window_size);
+                        end
                     end
+                    sequentialIndex = ((r-1)/interval)-3;
                     % gradient() finds the slope change between consequetive
                     % data points. 
                     dydx = gradient(h) ./ gradient(timeColum);
@@ -226,9 +243,9 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                     % gradients, then find the maximum value i.e. max slope
                     % change
                     maxSlopeChange = max(diff(dydx));
-                    ms_column(((r-1)/5)+1) = maxSlopeChange;   % r going in increments
+                    ms_column(sequentialIndex) = maxSlopeChange;
                 end
-                % append the ms_column to the existing msc table
+                % append the ms_column to the existing ms table
                 ms_dataset(:,ii) = ms_column;
             end
             processed_data(kk).(sets{ff})(1).MSC = ms_dataset;

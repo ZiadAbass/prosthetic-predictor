@@ -36,7 +36,8 @@ for ff = 1 : length(sets)
         window_size = int32(window_duration/avg_timestep);
         %-------------------------------------------------------
 
-        % extract time domain features from each dataset
+        % extract time domain features from each dataset, discarding
+        % endpoints to have all windows exactly the length they should be.
         smean = movmean(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
         stdD = movstd(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
         maxV = movmax(current_dataset_without_timestamp, window_size, 'Endpoints','discard');
@@ -115,11 +116,9 @@ for ff = 1 : length(sets)
                     % if towards the start of the column, ignore the window
                     continue
                 else
-                    % under normal conditions, take window/2 values before
-                    % r and window/2 values after it
                     if rem(window_size,2) == 0
+                        % if window size is even
                         g = (window_size-2)/2;
-                        % if window size is evn
                         h = colm(r-(g+1):r+g);
                     else
                         % if window size is odd
@@ -133,16 +132,15 @@ for ff = 1 : length(sets)
                     end
                 end
                 % if we had found a ZC then we want to assign 1, if not
-                % then 0. Indexing (((r-1)/5)+1) instead of r as r is
-                % increasing by increments of 5.
+                % then 0. Indexing `sequentialIndex` instead of r as r is
+                % increasing by non-1 increments.
                 sequentialIndex = ((r-1)/interval)-3;
                 if zc
-                    zc_column(sequentialIndex) = 1;   % if r going in 5s
+                    zc_column(sequentialIndex) = 1;
                 else
-                    zc_column(sequentialIndex) = 0;   % if r going in 5s
+                    zc_column(sequentialIndex) = 0;
                 end
                 zc = false;
-%                 fprintf("\nLength h is %i, length zc_col is %i\n", length(h), length(zc_column))
             end
             % append the zc_column to the existing zc table
             zc_dataset(:,ii) = zc_column;
@@ -154,15 +152,14 @@ end
 
 
 % ----------------------------------------------
-% Loop through all of the filtered_raw_data, extract Zero Crossing.
-fprintf("\nManually extracting MMM Crossing...\n")
+% Loop through all of the filtered_raw_data, extract Maximum Slope Change.
+fprintf("\nManually extracting MSC...\n")
 % ----------------------------------------------
 % extract zero crossing for the data and add to the same processed_data
 % struct
 % loop through each of the folders
 for ff = 1 : length(sets)
     for kk = 1 : length(filtered_raw_data)
-        % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
         current_dataset = filtered_raw_data(kk).(sets{ff});
         current_dataset_without_timestamp = current_dataset(:,2:end);
         current_timestamp = table2array(current_dataset(:,1));
@@ -195,15 +192,11 @@ for ff = 1 : length(sets)
         for ii = 1 : width(current_dataset_without_timestamp)
             % obtain the relevant column
             colm = table2array(current_dataset_without_timestamp(1:end,ii));
-            % calculate zero crossing manually
-            % (for each window, 1 if a ZC exists, 0 if not)
-            zc = false;
             clearvars ms_column
             % loop through the column
             for r = 1 : interval :length(colm)
                 if length(colm) < (window_size+2)
                     % if the column is smaller than the window size then ignore
-                    fprintf("\nHasal?\n")
                     continue
                 elseif r > (length(colm)-(half_window_size))
                     % if towards the end of the column, ignore the window
@@ -218,15 +211,24 @@ for ff = 1 : length(sets)
                         g = (window_size-2)/2;
                         % if window size is evn
                         h = colm(r-(g+1):r+g);
+                        timeColum = current_timestamp(r-(g+1):r+g);
                     else
                         % if window size is odd
                         h = colm(r-half_window_size:r+half_window_size);
+                        timeColum = current_timestamp(r-half_window_size:r+half_window_size);
                     end
                 end
                 sequentialIndex = ((r-1)/interval)-3;
-                ms_column(sequentialIndex) = mean(h);
+                % gradient() finds the slope change between consequetive
+                % data points. 
+                dydx = gradient(h) ./ gradient(timeColum);
+                % we now need to find the differences between consequtive
+                % gradients, then find the maximum value i.e. max slope
+                % change
+                maxSlopeChange = max(diff(dydx));
+                ms_column(sequentialIndex) = maxSlopeChange;
             end
-            % append the zc_column to the existing zc table
+            % append the ms_column to the existing ms table
             ms_dataset(:,ii) = ms_column;
         end
         processed_data(kk).(sets{ff})(1).MSC = ms_dataset;
