@@ -1,11 +1,16 @@
 %{
 This function takes in the name of the most significant body segment, as
-well as the dataset.
-It extracts all of the segment's information from the data, and returns the
-dataset after reducing it to only data from that segment.
+well as the dataset and extracts all of the segment's information.
+
+Arguments
+- `keyword`          -> body segment to extract (e.g. 'foot_r')
+- `labelledData`     -> the labelled dataset
+
+Returns:
+- `segmentFeaturesLabelled`  -> dataset after reducing it to only data from that segment.
 %}
 
-function [segment_features_labelled_data, sig_indexes]=extract_segment(keyword, final_labelled_data)
+function [segmentFeaturesLabelled, sig_indexes]=extract_segment(keyword, labelledData)
     % labels.csv contains all the class labels in english in the same order 
     % that they appear in the data
     feature_labels = readtable("labels.csv", "ReadVariableNames",true, 'Delimiter','comma');
@@ -28,9 +33,9 @@ function [segment_features_labelled_data, sig_indexes]=extract_segment(keyword, 
 
     end
     % extract just the segment's columns from the labelled data
-    class_labels = final_labelled_data(:,end-4:end);
-    segment_features_unlabelled = final_labelled_data(:,sig_indexes);
-    segment_features_labelled_data = horzcat(segment_features_unlabelled, class_labels);
+    class_labels = labelledData(:,end-4:end);
+    segment_features_unlabelled = labelledData(:,sig_indexes);
+    segmentFeaturesLabelled = horzcat(segment_features_unlabelled, class_labels);
 end
 
 

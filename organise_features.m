@@ -1,7 +1,5 @@
 %{
-This file takes in the 'processed data' struct with the extracted and
-reduced data.
-It organises the data:
+This function takes in the extracted time-domain features and organises the data:
 1. For each single dataset (each body part) we concatenate horizontally 
     all the features after removing the columns (features) that are not 
     needed eg magnetometere 
@@ -10,9 +8,17 @@ It organises the data:
     training samples of all features + parts of body
 3. We delete the columns containing magnetometer data as they are not
 relevant to the purpose of the classifiers we are building
+
+Arguments:
+- `processedData`  -> the struct containing the extracted and reduced
+time-domain features
+
+Returns:
+- `arrayPerActivity` -> struct containing a single array per
+activity without any magnetometer data.
 %}
 
-function array_per_activity_nomagnet = organise_features(processed_data)
+function arrayPerActivity = organise_features(processedData)
 
     % array containing the names of the activities. 
     % These names will match the field names in the struct
@@ -28,10 +34,10 @@ function array_per_activity_nomagnet = organise_features(processed_data)
     % all the features 
     % ----------------------------------------------
     for ff = 1 : length(sets)
-        for kk = 1 : length(processed_data)
+        for kk = 1 : length(processedData)
             % sample is the struct containing the 7 tables
             % (one for each time feature)
-            sample = processed_data(kk).(sets{ff});
+            sample = processedData(kk).(sets{ff});
             % extract each of the 7 features
             sample_max = sample(1).MAX;
             sample_min = sample(1).MIN;
@@ -96,12 +102,12 @@ function array_per_activity_nomagnet = organise_features(processed_data)
         end
         % update the table for each activity with the new one without the
         % magnetometer data
-        array_per_activity_nomagnet(1).(sets{ff}) = update_sample;
+        arrayPerActivity(1).(sets{ff}) = update_sample;
     end
 
 
     %{
-    Each activity now has one array in array_per_activity_nomagnet.
+    Each activity now has one array in arrayPerActivity.
     Each of those array has a size of Nx294
         63 columns from the raw data after removing the timestamps X
         7 extracted time domain features X

@@ -1,6 +1,18 @@
 %{
 This function builds a multiclass svm model and evaluates it using 
 Posterior Probabilities
+
+Arguments
+- `labelledData`    -> the data labelled through one-hot encoding 
+                        (these labels are irrelevant for SVMs and will 
+                        be removed by the code below)
+- `svmTargets`      -> the Nx1 unique string class labels for SVM targets
+- `kernelFunction`  -> the kernel function to use for training the SVM model
+- `boxConstraint`   -> the C parameter to use for training the SVM model.
+
+Returns
+- `accuracy`        -> classification accuracy obtained when the created
+SVM model is tested with the unseen test set
 %}
 
 function [accuracy]=svm_posterior(labelledData, svmTargets, kernelFunction, boxConstraint)
@@ -111,12 +123,5 @@ function [accuracy]=svm_posterior(labelledData, svmTargets, kernelFunction, boxC
     fprintf("\nModel binary loss: %s\n-------------\n", SVMModel.BinaryLoss)
     % Binary Loss is quadratic since posterior probabilities are 
     % being found by all the binary learners
-
-    %{ 
-    We can see that the confusion matrix produced by the SVM model using 
-    posterior probability does not show 100% classification accuracy like the
-    one produced when the SVM was evaluated normally. 
-    This way of evaluating the SVM model is more robust.
-    %}
 end
 

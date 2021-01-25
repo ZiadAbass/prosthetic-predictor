@@ -1,14 +1,13 @@
 %{ 
-This file imports all the datasets and outputs a 1x12 struct with 5 fields ("LGW","RA","RD","SiS" and "StS")
-It also deletes all timestamp columns apart from the very first one in each dataset 
-and any columns with values of 0.
+This function imports all the datasets and deletes all timestamp columns 
+apart from the very first one in each dataset and any columns with values of 0.
+
+Returns
+- `rawData`    -> a 1x12 struct with 5 fields ("LGW","RA","RD","SiS" and "StS")
 %}
 
-function [raw_data] = new_import_datasets()
-
-    rng(0)  % to achieve same randomisation each time
-
-    % defs
+function [rawData] = new_import_datasets()
+    % initialisations
     previous_is_timestamp = false;
     columnsToDelete = ("yes");
 
@@ -18,7 +17,7 @@ function [raw_data] = new_import_datasets()
     % loop through each of the folders
     for ff = 1 : length(folders)
         % specify the folder we are interested in during this loop
-        myFolder = folders(ff); % Wherever...
+        myFolder = folders(ff);
         % Get a list of all .dat files in the folder
         filePattern = fullfile(myFolder, '*.dat');
         theFiles = dir(filePattern);
@@ -32,13 +31,12 @@ function [raw_data] = new_import_datasets()
           dataset = readtable(fullFileName, "ReadVariableNames",true);
           % read the .dat file also into a cell variable to allow retrieval of
           % column details such as data type and units (seconds, milliseconds, etc)
-          raw_dataset = readcell(fullFileName);
+          rawDataset = readcell(fullFileName);
 
           % ----------------------------------------------
           % loop through each column in the dataset to remove those with synchronisation time vectors
           % ----------------------------------------------
           for col = 1 : width(dataset)
-    %           fprintf('\nHere is column #%d, which is called %s\n', col, dataset.Properties.VariableNames{col})
               thisColumn = dataset(:, col); % Extract this one column into its own variable.
               avg = abs(nanmean(thisColumn{:,end}));
               % should delete columns with an average this high as it means
@@ -62,7 +60,7 @@ function [raw_data] = new_import_datasets()
           % append the contents of the .dat file to the struct under the
           % relevant field name and number
           % ----------------------------------------------
-          raw_data(kk).(folders{ff}) = dataset; 
+          rawData(kk).(folders{ff}) = dataset; 
         end
     end
 end

@@ -1,23 +1,28 @@
 %{
-This file takes in the struct containing all the datasets 
-- Need to filter the data
-- Extract all the time-domain features:
+This file takes in the struct containing the filtered data and extract all 
+the time-domain features:
     1. Maximum
     2. Minimum
     3. Mean
     4. Standard deviation
     5. Root means square (RMS)
-    6. Maximum slope changes
-    7. Zero crossing
-        The notations for them: "MAX", "MIN", "AVG", "SD","RMS".
+    6. Zero crossing
+    7. Maximum slope changes
+    
+    The notations for them: "MAX", "MIN", "AVG", "SD", "RMS", "ZC", "MSC".
 
-This script outputs the 'processed_data' struct. The data is reduced using the given time window.
+Arguments:
+- `filteredRawData`   -> the struct with the raw data after going through
+                            the low pass filter.
 
+Returns:
+- `processedData`  -> struct with the time-domain features extracted
+                        according to the given time window and interval
 %}
 
-function processed_data = extract_reduce_features(filtered_raw_data)
+function processedData = extract_reduce_features(filteredRawData)
     % ----------------------------------------------
-    % Loop through all of the filtered_raw_data, extract max, min, mean, standard
+    % Loop through all of the filteredRawData, extract max, min, mean, standard
     % deviation and RMS.
     fprintf("\nExtracting time domain features...\n")
     % ----------------------------------------------
@@ -33,8 +38,8 @@ function processed_data = extract_reduce_features(filtered_raw_data)
     timeInterval = 50;
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(filtered_raw_data)
-            current_dataset = table2array(filtered_raw_data(kk).(sets{ff}));
+        for kk = 1 : length(filteredRawData)
+            current_dataset = table2array(filteredRawData(kk).(sets{ff}));
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = current_dataset(:,1);
 
@@ -68,23 +73,23 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                 % We want to extract only every Nth row to match our time
                 % interval. The 'interval' var defines N.
                 [reduced_data, interval] = reduce_data(current_timestamp, dataset_features{1,w}, timeInterval);
-                temp_processed_data(1).(features{w}) = reduced_data; 
+                temp_processedData(1).(features{w}) = reduced_data; 
             end
-            processed_data(kk).(sets{ff}) = temp_processed_data;
+            processedData(kk).(sets{ff}) = temp_processedData;
         end
     end
 
     % ----------------------------------------------
-    % Loop through all of the filtered_raw_data, extract Zero Crossing.
+    % Loop through all of the filteredRawData, extract Zero Crossing.
     fprintf("\nManually extracting Zero Crossing...\n")
     % ----------------------------------------------
-    % extract zero crossing for the data and add to the same processed_data
+    % extract zero crossing for the data and add to the same processedData
     % struct
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(filtered_raw_data)
+        for kk = 1 : length(filteredRawData)
             % fprintf("\nIn set number %i and dataset number %i, in set %s\n", ff, kk, sets(ff))
-            current_dataset = filtered_raw_data(kk).(sets{ff});
+            current_dataset = filteredRawData(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
             % -------------------------------------------------------
@@ -162,22 +167,22 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                 % append the zc_column to the existing zc table
                 zc_dataset(:,ii) = zc_column;
             end
-            processed_data(kk).(sets{ff})(1).ZC = zc_dataset;
+            processedData(kk).(sets{ff})(1).ZC = zc_dataset;
         end
     end
 
 
 
     % ----------------------------------------------
-    % Loop through all of the filtered_raw_data, extract Maximum Slope Change.
+    % Loop through all of the filteredRawData, extract Maximum Slope Change.
     fprintf("\nManually extracting MSC...\n")
     % ----------------------------------------------
-    % extract zero crossing for the data and add to the same processed_data
+    % extract zero crossing for the data and add to the same processedData
     % struct
     % loop through each of the folders
     for ff = 1 : length(sets)
-        for kk = 1 : length(filtered_raw_data)
-            current_dataset = filtered_raw_data(kk).(sets{ff});
+        for kk = 1 : length(filteredRawData)
+            current_dataset = filteredRawData(kk).(sets{ff});
             current_dataset_without_timestamp = current_dataset(:,2:end);
             current_timestamp = table2array(current_dataset(:,1));
             % -------------------------------------------------------
@@ -248,7 +253,7 @@ function processed_data = extract_reduce_features(filtered_raw_data)
                 % append the ms_column to the existing ms table
                 ms_dataset(:,ii) = ms_column;
             end
-            processed_data(kk).(sets{ff})(1).MSC = ms_dataset;
+            processedData(kk).(sets{ff})(1).MSC = ms_dataset;
         end
     end
 end

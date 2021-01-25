@@ -1,11 +1,22 @@
 %{
-cross_validate_nn() takes in the processed data and performs K-Fold Cross
-Validation by randomising the samples then taking sequential folds from the
-data. It retrieves the classification accuracy from each fold and finds the
+This function performs K-Fold Cross Validation by randomising the 
+samples then taking sequential folds from the data to build a pattern
+recognition network model.
+It retrieves the classification accuracy from each fold and finds the
 mean accuracy accross all the folds.
+
+Arguments
+- `labelledData`        -> the data labelled through one-hot encoding
+- `folds`               -> the number of folds required
+- `hiddenLayerSize`     -> number of neurons required in the hidden layer
+- `trainingAlgo`        -> the NN training algorithm to use
+
+Returns
+- `meanAccuracy`        -> the average classification accuracy of all
+                            the models across the N folds.
 %}
 
-function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize, trainingAlgo)
+function [meanAccuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSize, trainingAlgo)
     % define the number test samples in each fold
     test_element_count = int32(size(labelledData,1)/folds);
 
@@ -37,7 +48,7 @@ function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSi
 
             % train the ANN with the extracted data
             acc = nn(train_inputs, test_inputs, train_targets, test_targets, hiddenLayerSize, trainingAlgo);
-            fprintf("\n    Accuracy for this fold is %f\n\n", acc)
+            fprintf("\nAccuracy for this fold is %f\n", acc)
 
             foldCounter = foldCounter+1;
             % keep track of all the accuracies to find the mean
@@ -46,6 +57,6 @@ function [final_accuracy] = cross_validate_nn(labelledData, folds, hiddenLayerSi
     end
 
     % give a summary of all the folds
-    final_accuracy = total_accuracy/folds;
-    fprintf("\n===================\nAverage accuracy across %i folds: %f\n===================\n", folds, final_accuracy);
+    meanAccuracy = total_accuracy/folds;
+    fprintf("\n===================\nAverage accuracy across %i folds: %f\n===================\n", folds, meanAccuracy);
 end

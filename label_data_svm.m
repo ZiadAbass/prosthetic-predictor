@@ -1,13 +1,18 @@
 %{
-This script takes in the array_per_activity_nomagnet struct containing a
+This function takes in the arrayPerActivity struct containing a
 single table for each activity.
-We now want to label this data
-    (eg if one-hot-encoding will need a complementary matrix with labels)
-We also want to group all of the data into a single table after labelling
-it.
+It labels this data by assigning a unique label to each class.
+
+Arguments
+- `arrayPerActivity` -> struct containing a single array per
+activity without any magnetometer data.
+
+Returns
+- `unlabelledInputs`    -> just the input data
+- `classLabels`         -> [Nx1] class labels with a unique string for each class
 %}
 
-function [final_inputs_svm, final_targets_svm] = label_data_svm(array_per_activity_nomagnet)
+function [unlabelledInputs, classLabels] = label_data_svm(arrayPerActivity)
     % array containing the names of the activities. 
     % These names will match the field names in the struct
     sets = ["LGW","RA","RD","SiS","StS"];
@@ -19,7 +24,7 @@ function [final_inputs_svm, final_targets_svm] = label_data_svm(array_per_activi
     % ----------------------------------------------
     for ff = 1 : length(sets)
         % obtain the number of rows in the current dataset
-        sample = array_per_activity_nomagnet(1).(sets{ff});
+        sample = arrayPerActivity(1).(sets{ff});
         temp_labels = cell(length(sample),1);
 
         % we want one column of labels, each row labelled using a string
@@ -28,11 +33,11 @@ function [final_inputs_svm, final_targets_svm] = label_data_svm(array_per_activi
 
         % store all the targets as one long 1D array
         if ff == 1
-            final_targets_svm = temp_labels;
-            final_inputs_svm = sample;
+            classLabels = temp_labels;
+            unlabelledInputs = sample;
         else
-            final_targets_svm = vertcat(final_targets_svm, temp_labels);
-            final_inputs_svm = vertcat(final_inputs_svm, sample);
+            classLabels = vertcat(classLabels, temp_labels);
+            unlabelledInputs = vertcat(unlabelledInputs, sample);
         end
     end
 end
