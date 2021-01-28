@@ -32,5 +32,4 @@ function [x, Y, filtered_Y] = visualiseFilterData(raw_data, cutoffFreq, sampleRa
     % apply the low pass filter
     filtered_Y = filter(d, Y);
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

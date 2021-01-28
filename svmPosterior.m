@@ -124,4 +124,4 @@ function [accuracy]=svmPosterior(labelledData, svmTargets, kernelFunction, boxCo
     % Binary Loss is quadratic since posterior probabilities are 
     % being found by all the binary learners
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

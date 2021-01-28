@@ -45,4 +45,4 @@ function [reducedData, interval]=reduceData(timestampColumn,dataTable, timeInter
     % return the reduced data
     reducedData = incrementing_reducedData;
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

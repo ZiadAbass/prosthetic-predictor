@@ -57,4 +57,4 @@ function [fifteenFeaturesLabelledData]=find15Features(labelledData, unlabelledIn
     % plot the bar chart showing the most significant 15 features
     bar(X,Y)
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

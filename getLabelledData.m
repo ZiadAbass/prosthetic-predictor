@@ -55,4 +55,4 @@ function [labelledData] = getLabelledData(arrayPerActivity)
     % Define the target set
     final_targets_nn = labelledData(:, end-4:end)'; % Take all the rows, and the last 5 columns as outputs. 
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

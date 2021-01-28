@@ -31,4 +31,4 @@ function [] = experimentFilters(raw_data, cutoffFreq, sampleRate)
     mainTitle = sprintf("Single features before (blue) & after (red) applying a low pass filter of %i Hz", cutoffFreq);
     sgtitle(mainTitle)
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

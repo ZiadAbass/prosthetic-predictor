@@ -37,5 +37,4 @@ function [segmentFeaturesLabelled, sig_indexes]=extractSegment(keyword, labelled
     segment_features_unlabelled = labelledData(:,sig_indexes);
     segmentFeaturesLabelled = horzcat(segment_features_unlabelled, class_labels);
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
