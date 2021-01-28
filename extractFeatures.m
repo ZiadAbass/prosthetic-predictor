@@ -257,3 +257,4 @@ function processedData = extractFeatures(filteredRawData)
         end
     end
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

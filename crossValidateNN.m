@@ -60,3 +60,4 @@ function [meanAccuracy] = crossValidateNN(labelledData, folds, hiddenLayerSize, 
     meanAccuracy = total_accuracy/folds;
     fprintf("\n===================\nAverage accuracy across %i folds: %f\n===================\n", folds, meanAccuracy);
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

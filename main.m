@@ -1,4 +1,3 @@
-
 clear;      % clear the workspace
 clc;        % clear the command window
 close all;  % close all popup windows
@@ -72,3 +71,4 @@ singleSegmentNNAccuracy = crossValidateNN(segmentFeaturesLabelled, 5, 35, "train
 fprintf("\n--------\n Training the SVM using features from a single segment...\n--------\n")
 singleSegmentSVMAccuracy = svmPosterior(segmentFeaturesLabelled, classLabels, "polynomial", 1);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

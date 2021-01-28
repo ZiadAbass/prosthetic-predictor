@@ -19,7 +19,6 @@ function [unlabelledInputs, classLabels] = getUnlabelledData(arrayPerActivity)
     sets = ["LGW","RA","RD","SiS","StS"];
     % redefining the sets in a way that is compatible with SVM class labelling
     sets_for_labels = [{'LGW'} {'RA'} {'RD'} {'SiS'} {'StS'}];
-
     % ----------------------------------------------
     % Label the data by having a single column dedicated for string class labels
     % ----------------------------------------------
@@ -42,14 +41,4 @@ function [unlabelledInputs, classLabels] = getUnlabelledData(arrayPerActivity)
         end
     end
 end
-
-
-
-
-
-
-
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

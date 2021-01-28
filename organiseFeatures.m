@@ -104,8 +104,6 @@ function arrayPerActivity = organiseFeatures(processedData)
         % magnetometer data
         arrayPerActivity(1).(sets{ff}) = update_sample;
     end
-
-
     %{
     Each activity now has one array in arrayPerActivity.
     Each of those array has a size of Nx294
@@ -117,8 +115,5 @@ function arrayPerActivity = organiseFeatures(processedData)
     The N varies with each dataset depending on the original number of rows (samples) in
     the raw data.
     %}
-
 end
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

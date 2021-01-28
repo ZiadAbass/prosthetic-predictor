@@ -19,7 +19,6 @@ function [labelledData] = getLabelledData(arrayPerActivity)
     % array containing the names of the activities. 
     % These names will match the field names in the struct
     sets = ["LGW","RA","RD","SiS","StS"];
-
     % ----------------------------------------------
     % Label the data by adding an extra 5 columns at the end of
     % each activity array. Only the column corresponding to the 
@@ -36,7 +35,6 @@ function [labelledData] = getLabelledData(arrayPerActivity)
         labelled_activity(:,end-(5-ff)) = temp_true_labels;
         labelled_array_per_activity(1).(sets{ff}) = labelled_activity;
     end
-
     % ----------------------------------------------
     % Vertically concatenate the 5 tables into one long table
     % ----------------------------------------------
@@ -48,7 +46,6 @@ function [labelledData] = getLabelledData(arrayPerActivity)
             labelledData = vertcat(labelledData, sample);
         end
     end
-
     % ----------------------------------------------
     % Split data into inputs and targets for ML
     % ----------------------------------------------
@@ -57,15 +54,5 @@ function [labelledData] = getLabelledData(arrayPerActivity)
 
     % Define the target set
     final_targets_nn = labelledData(:, end-4:end)'; % Take all the rows, and the last 5 columns as outputs. 
-
 end
-
-
-
-
-
-
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

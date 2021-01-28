@@ -32,7 +32,6 @@ function [rawData] = importDatasets()
           % read the .dat file also into a cell variable to allow retrieval of
           % column details such as data type and units (seconds, milliseconds, etc)
           rawDataset = readcell(fullFileName);
-
           % ----------------------------------------------
           % loop through each column in the dataset to remove those with synchronisation time vectors
           % ----------------------------------------------
@@ -64,3 +63,4 @@ function [rawData] = importDatasets()
         end
     end
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

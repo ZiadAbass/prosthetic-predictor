@@ -42,12 +42,7 @@ function [reducedData, interval]=reduceData(timestampColumn,dataTable, timeInter
         index = (((ii-1)/5)+1);
         incrementing_reducedData(index,:) = dataTable(index, :);
     end
-
-    % return reducedData
+    % return the reduced data
     reducedData = incrementing_reducedData;
 end
-
-
-
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
