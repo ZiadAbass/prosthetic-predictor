@@ -11,6 +11,9 @@
 %% "extractFeatures.m"
 % <include>extractFeatures.m</include>
 
+%% "reduceData.m"
+% <include>reduceData.m</include>
+
 %% "organiseFeatures.m"
 % <include>organiseFeatures.m</include>
 
