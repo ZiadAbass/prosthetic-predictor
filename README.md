@@ -25,7 +25,8 @@ A pattern recognition network is created with a single hidden layer
 ### Support Vector Machine
 
 ## How to Run
-1. Clone the repo
+1. Clone the repo using `git clone https://github.com/ZiadAbass/prosthetic-predictor.git --depth 1`. 
+>NOTE: This depth specification makes git ignore the repo's commit history, which includes irrelevant binary files that would otherwise make the repo size too big.
 2. Change your MATLAB directory to that of the repo
 3. Run `main.m` and you're good to go!
 >NOTE: There are some optional function calls commented out in `main.m`. Look through the file to determine the code flow.
