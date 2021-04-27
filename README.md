@@ -4,6 +4,8 @@ This is a MATLAB-based machine learning project used to classify 5 different act
 1. Multi-Class one-vs-all Support Vector Machine (SVM) 
 2. Pattern Recognition Artificial Neural Network (ANN).
 
+An IMU is an Inertial Measurement Unit that contains an accelerometer, gyroscope and a magnetometer.
+
 -----------
 </br>
 
