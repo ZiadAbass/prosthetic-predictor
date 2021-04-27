@@ -18,7 +18,7 @@ This is a MATLAB-based machine learning project used to classify 5 different act
 </br>
 
 ## The Data
-The data used was collected from various healthy volunteers who wore 5 IMU sensors on different parts of the body:
+The data used was obtained during a study led by Professor Abbas Dehghani-Sanij at the University of Leeds. It was collected from various healthy volunteers who wore 5 IMU sensors on different parts of the body:
 - Right foot
 - Left foot
 - Right thigh
@@ -26,11 +26,11 @@ The data used was collected from various healthy volunteers who wore 5 IMU senso
 - Pelvis
 
 While each wearing these 5 IMU sensors, they performing the following 5 activities of daily living:
-- Level-Ground walking
-- Going up a ramp
-- Going down a ramp
-- Standing to sitting
-- Sitting to standing
+- Level-Ground walking ([LGW](/LGW))
+- Going up a ramp ([RA](/RA))
+- Going down a ramp ([RD](RD))
+- Standing to sitting ([StS](StS))
+- Sitting to standing ([SiS](SiS))
 
 </br>
 
